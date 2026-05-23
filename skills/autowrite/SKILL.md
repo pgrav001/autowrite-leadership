@@ -101,7 +101,23 @@ If text extraction is poor (scanned image, heavy formatting, missing words), ann
 4. Read [references/profile-template.md](references/profile-template.md) so you know the profile schema.
 5. Read [references/recruiter-subagent-prompt.md](references/recruiter-subagent-prompt.md), [references/research-subagent-prompt.md](references/research-subagent-prompt.md), [references/job-openings-subagent-prompt.md](references/job-openings-subagent-prompt.md), [references/hiring-manager-subagent-prompt.md](references/hiring-manager-subagent-prompt.md), and [references/cover-letter-subagent-prompt.md](references/cover-letter-subagent-prompt.md) so you know exactly how each subagent role will be invoked.
 6. Read [references/resume-html-template.md](references/resume-html-template.md) and [references/cover-letter-html-template.md](references/cover-letter-html-template.md) so you know the print-ready HTML conventions used when rendering locked variants, per-opening resumes, and per-opening cover letters.
-7. **Check for existing run state.** Look ONLY at `<resume-parent-dir>/autowrite-<resume-slug>/`. If that directory exists with a `results.tsv` row at experiment 0 or higher:
+7. **Detect the run's `director_level` signal.** This flag drives downstream profile shape, eval categories, mutation discipline, recruiter persona, and cover-letter shape -- a missed director signal collapses the entire director-tuned surface back to IC behavior. Detect in this priority order:
+
+   a. **User-provided role qualifier wins.** If ANY target in the invocation contains a role qualifier with: `director`, `vp`, `vice president`, `head of`, `senior manager`, `managing director`, `chief`, or a title containing `lead` paired with a director-scale function (`engineering lead`, `product lead`, `design lead`), set `run_director_level: true`.
+
+   b. **Else infer from the resume's most recent role.** Look at the first role under the Experience / Work Experience / Professional Experience section (typically the H3 directly under the section header, or the topmost dated entry). If its title contains any of the same tokens above, set `run_director_level: true` (the candidate is currently a director-level operator targeting a lateral or upward move).
+
+   c. **Else default to `run_director_level: false`** -- assume IC search unless the user corrects.
+
+   **Announce the detection in chat.** Format:
+
+   > Director-level detection: `<true | false>`. Source: `<user-supplied qualifier "Anthropic / Director of Engineering" | resume's current role "Director of X at Y" | no signal detected; defaulting to IC>`. This sets the profile shape (Leadership bar vs Technical bar), eval categories (org-scope vs technical-output), mutation discipline (scope-first vs bullet-quantification), and cover-letter shape (350-500 words strategic vs 250-400 words artifact-anchored). Correct in your next message if this is wrong before the loop spends meaningful time.
+
+   **Persist the flag to `results.json`** at the top level: `"director_level": true` or `"director_level": false`. On a resumed run (`clean_run: false`), read `director_level` from the existing `results.json` and skip re-detection -- the prior run's determination is authoritative unless the user explicitly overrides.
+
+   **If `run_director_level: true`, additionally read [references/director-structure-audit.md](references/director-structure-audit.md).** It defines the structural audit that runs in Step 4 before the line-level mutation loop. Skip this read on IC runs -- the audit is director-specific and would mislead an IC run if applied.
+
+8. **Check for existing run state.** Look ONLY at `<resume-parent-dir>/autowrite-<resume-slug>/`. If that directory exists with a `results.tsv` row at experiment 0 or higher:
 
    - **If `clean_run: true`** (per the context-gathering step 6): archive the existing `autowrite-<resume-slug>/`, `applications/<company>/_company-locked.{md,html}`, `applications/<company>/index.html`, `applications/<company>/results-openings.tsv`, and every per-role subdirectory under `applications/<company>/` (i.e., everything in `applications/<company>/` EXCEPT the `openings-*.json` and `openings-*.md` files) to `<resume-parent-dir>/archive/<YYYY-MM-DD>-<HHMM>/`. The openings JSON / MD remain in place so Step 6a can skip discovery. Announce: "Clean-run mode: archived prior run artifacts to `<archive-path>/`. Discovery output retained at `<openings-paths>`. Starting fresh primary baseline."
    - **If `clean_run: false`** (default): this is a **resume scenario**, not a fresh start. Read the existing `results.json` and `changelog.md`. Announce in chat: "Resuming from experiment N (status: <status>). Profiles already in cache: [...]. Locked variants already produced: [...]." Then continue the loop from where it stopped rather than re-baselining.
@@ -218,6 +234,25 @@ Run the recruiter eval AS-IS on the original resume before changing anything. Th
 9. Compute the aggregate (mean across profiles -- weighted if the user provided weights).
 10. Write the baseline row to `results.tsv` and update `results.json`.
 
+### Step 4.5 -- Director-level structural audit (conditional)
+
+**Run this step ONLY if the run's `director_level` flag is `true` (set at Step 1.1 sub-step 7).** Skip entirely for IC runs.
+
+Director resumes most often fail for structural reasons -- missing executive summary, output-first framing, headcount/budget never surfaced, no external-value differentiator -- not for bullet-level reasons. The line-level mutation loop in Step 5 can only re-shape bullets; it cannot re-architect the resume. Running the audit before the loop catches these failures upstream.
+
+Procedure:
+
+1. Read [references/director-structure-audit.md](references/director-structure-audit.md) (you should have already read it at Step 1.1 sub-step 7 for director runs).
+2. Apply the six checks defined there against the current working file.
+3. Present the findings to the user with three choices: `apply now` (bundle as experiment 0.5), `show me the text` (review per-mutation before applying), `skip` (proceed to line-level loop).
+4. Honor the user's choice per the contract in `director-structure-audit.md`.
+5. If `apply now` (or `show me the text` followed by acceptance): run experiment 0.5 (structural bundle), re-score against all profiles, apply keep/discard at the bundle level (revert if aggregate drops >2pt). Log to `changelog.md` and `results.tsv` as a single experiment-0.5 row.
+6. The post-audit (or reverted-to-original) working file becomes the new baseline for Step 5.
+
+**This is the only place in the entire loop where multiple mutations bundle into a single experiment.** Every other experiment in Step 5 follows one-mutation-at-a-time discipline. The bundling here is deliberate: structural changes touch multiple parts of the document at once, and their value is pre-requisite to per-mutation causal tracking.
+
+After Step 4.5 completes (or is skipped on IC runs), proceed to Step 5 with the working file as baseline.
+
 **results.tsv format (tab-separated):**
 
 ```
@@ -332,7 +367,7 @@ Run this loop **for each company that locked** during the primary loop. If multi
 
 In all reuse paths, the rule from "No fit predictions at the selection step" applies: process every active role from the cached discovery, no editorial subset. Cached discovery's `active_status` and `excluded_reason` tags are honored (mechanical filter), but the parent skill does not apply additional judgment on top.
 
-Otherwise (fresh discovery, not clean-run): Spawn the **job-openings discovery subagent** using [references/job-openings-subagent-prompt.md](references/job-openings-subagent-prompt.md). Pass it the company name, today's date, and the locked resume variant (used only to calibrate role-family filtering, not for scoring).
+Otherwise (fresh discovery, not clean-run): Spawn the **job-openings discovery subagent** using [references/job-openings-subagent-prompt.md](references/job-openings-subagent-prompt.md). Pass it the company name, today's date, the run's `director_level` flag (as the subagent's `Director-level search flag` -- this gates whether the subagent searches the director-specific sources defined in its prompt), and the locked resume variant (used only to calibrate role-family filtering, not for scoring).
 
 **Hand-off contract.** The subagent's JSON response can be large (50+ roles for a major company). Save the raw JSON to disk immediately upon receiving it -- do NOT hold the full payload in active context. The parent's working memory only needs a digest (count by status, count by source, the list of role titles + URLs + slugs). The full record per role is re-read from disk in batches during 6b-6e.
 
@@ -466,6 +501,7 @@ Pass each subagent:
 - The per-role `resume.md` markdown that 6e just produced (inline) -- **not** `_company-locked.md`; the role-tailored variant is the source of truth for what the candidate is claiming for THIS role
 - The full supplementary-context library that Step 1.1 loaded from `bullets/`, `interview-notes/`, `narratives/`, `context/` (every file's content concatenated inline with relative-path separator lines)
 - The `Candidate review flag` set to `yes` if the role was budget-exhausted at 6d (`flag_for_review` in TSV terms), otherwise `no`
+- The `Director-level flag` set to `yes` if the hiring-manager profile's frontmatter has `director_level: true`, otherwise `no` (the cover-letter subagent uses this to switch between the IC-style and director-style letter shape and word count)
 
 Each subagent returns a markdown letter body (250-400 words; salutation = `Dear <Team> team,` when a team name is set, else `Dear Hiring Manager,`; opening sentence anchors on one resume claim mapped to the strongest hiring-manager-profile eval; body paragraphs echo 2-3 hiring-manager-profile evals in prose with verbatim resume/library evidence; no fabrication).
 

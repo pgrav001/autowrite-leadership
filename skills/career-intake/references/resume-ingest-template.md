@@ -43,6 +43,14 @@ Build an in-memory list `roles[]` with one entry per role. Order is the resume's
 
 A role is the **current role** if its end date is "Present" or empty AND it is the most-recent entry in the resume's experience section. Note this in the role's metadata -- it is the only role whose seed file gets the `current_role: true` field.
 
+**Director-level detection.** After parsing the role list, check the current role's title (or, if no current role, the most-recent role's title) for any of: `director`, `vp`, `vice president`, `head of`, `senior manager`, `managing director`, `chief`, or `engineering lead` / `product lead` / `design lead` at director scope. If present, set an in-memory flag `candidate_director_level: true` for this run. This flag drives:
+
+1. The round selection in the decision question -- when `candidate_director_level: true`, the "Needs depth on these roles" branch should default to the Director-level core rounds (Team Building, Current Role, Strategic Decisions, Organizational Adversity, Cross-Functional Influence) from `interview-rounds.md`, rather than the IC-default 5 (Career Arc, Current Role, Flagship Project, Skills+Behavioral, Personal Projects). The user can still override.
+2. The "what was parsed" announcement in chat -- include a one-line note: "Detected director-level signal from `<current role title>`. Q&A rounds will be drawn from the Director-level core set by default; you can override during round selection."
+3. The session log -- write `detected_director_level: true` to the session-log frontmatter so downstream tools (and a later autowrite run reading the supplementary library) can see the prior career-intake's determination.
+
+If no director-level signal is detected, do not set the flag; proceed with the default IC round set and announcement.
+
 ### 2. Projects
 
 A "project" is any entry under the resume's Personal Projects / Selected Work / Portfolio / Projects section. Each project has:

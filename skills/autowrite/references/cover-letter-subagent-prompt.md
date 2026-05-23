@@ -52,13 +52,15 @@ You are drafting a cover letter for one specific job opening. The letter ships a
 
 **Candidate review flag (only set when the resume variant was marked for manual review by the secondary-loop sub-mutation budget exhaustion):** [yes | no]
 
+**Director-level flag (set from the hiring-manager profile's `director_level` frontmatter):** [yes | no]
+
 ## Your output
 
 Return the cover letter body as markdown. Return ONLY the markdown -- no preamble, no closing notes, no rationale paragraph. The parent skill will save it.
 
 If `Candidate review flag` is `yes`, prepend a `## Manual review needed` heading with one sentence noting the resume was budget-exhausted on this role and the letter should be reviewed for any structural mismatch before submission. Then continue with the normal letter structure below.
 
-## Letter shape
+## Letter shape -- IC and manager roles (Director-level flag = no)
 
 ```
 [Date in "Month DD, YYYY" form]
@@ -79,6 +81,31 @@ Sincerely,
 [Candidate Name -- pulled from the resume's top-level heading]
 ```
 
+## Letter shape -- Director-level roles (Director-level flag = yes)
+
+Director-level cover letters do different work than IC cover letters. They are read by hiring executives or search committees who already know the candidate has the technical chops on paper -- otherwise the resume wouldn't have surfaced. The letter's job is to demonstrate executive presence, strategic positioning, and organizational judgment in prose. The artifact-anchored opening that works for IC letters reads as junior at director level.
+
+```
+[Date in "Month DD, YYYY" form]
+
+Dear <salutation>,
+
+<Opening paragraph -- 2-3 sentences. Lead with strategic positioning, not an artifact. The opening should answer "what is the organizational problem this candidate solves, and why is it relevant to this specific role at this specific moment?" Reference the company's current strategic situation as the anchor (drawn from the hiring-manager profile's `## Stakeholder environment` or `## Recent strategic priorities` sections, or from the JD's framing of the role), then state what the candidate brings to that situation. No fluff openers, no artifact-first framing ("I built X"), no aspirational language ("I have always wanted to..."). The opening sentence is the one a hiring executive skimming would remember -- and it should sound like a peer speaking to a peer, not a candidate selling themselves.>
+
+<Body paragraph 1 -- 4-6 sentences. Echo a load-bearing org-scope hiring-manager-profile eval (team size, budget, cross-functional reach, organizational adversity, or strategic decision-making). Cite specific resume evidence: not what the candidate built, but what the candidate decided, restructured, hired, or sponsored, and what changed because of that decision. Quantify scope (headcount, budget, scope of decision) wherever the resume or library supports it. This paragraph is where the candidate proves the resume's scope claims are real and operationally lived, not just numbers.>
+
+<Body paragraph 2 -- 4-6 sentences. Echo a second hiring-manager-profile eval, ideally one that pairs with the JD's stated responsibilities. If the JD describes a specific organizational situation ("scale the team from 12 to 30 in 18 months", "consolidate three teams into one platform org", "build out a new function"), this is the paragraph where the candidate names the closest analog from their own history. Same evidence rule -- specific decisions, specific outcomes, no fabrication.>
+
+<Optional body paragraph 3 -- 3-4 sentences. Used when an external-value differentiator is a load-bearing signal for this role (cross-industry transition, specific external practice, public artifact, scale shift). Most director-level letters benefit from including this paragraph; skip only when the previous two paragraphs have already saturated the strongest signals.>
+
+<Closing paragraph -- 2-3 sentences. State availability and one concrete sentence about what comes next, framed as a peer-to-peer next step rather than a candidate-to-employer one ("Happy to talk through any of the specifics above when we connect" or "I can be reached at [contact] for next steps in the search process"). No "I look forward to hearing from you" filler. No "Thank you for your consideration" -- that framing collapses peer-to-peer voicing into supplicant-voicing.>
+
+Sincerely,
+[Candidate Name -- pulled from the resume's top-level heading]
+```
+
+The director-level letter's voice is the most important variable. Read each draft sentence and ask: "Could this sentence appear in a peer's note to the hiring executive?" If the answer is no -- if it reads as a candidate addressing a recruiter -- rewrite at peer voice. Executive presence on paper is the highest-leverage signal a cover letter can carry at this level.
+
 ## Salutation rules
 
 - If `Team (if named in JD)` is set to a real team name, write `Dear <Team Name> team,` (e.g., `Dear Applied AI team,`).
@@ -87,8 +114,8 @@ Sincerely,
 
 ## Word count
 
-- **Target: 250-400 words** (excluding the date line, salutation, and signature).
-- Letters under 200 words read as low-effort. Letters over 450 words read as filler-heavy.
+- **IC and manager roles (Director-level flag = no): 250-400 words** (excluding the date line, salutation, and signature). Letters under 200 words read as low-effort; letters over 450 words read as filler-heavy.
+- **Director-level roles (Director-level flag = yes): 350-500 words.** Director letters carry more strategic context, more org-scope evidence, and frequently a third paragraph for the external-value differentiator. Letters under 300 words at director level read as undercooked; letters over 550 words read as belabored. The mid-range (380-450) is the sweet spot for most director letters.
 - Count words once before returning; if outside the range, tighten or expand by trimming or restoring one body sentence at a time, not by adding new claims.
 
 ## Hard constraints (the no-fabrication rule)
@@ -114,11 +141,19 @@ Sincerely,
 
 ## Examples of opening sentences that work (for shape -- do not copy)
 
+**IC and manager (artifact-anchored openings):**
+
 - "The Applied AI Engineer posting describes evaluation-harness work as the load-bearing piece -- the Agentic Forensics research and the A/B/C harness across Claude Code, OpenCode, and Codex sit exactly on that surface."
 - "Your engineering team is hiring for someone who can ship multi-agent reasoning systems end-to-end; the five-stage reasoning framework I deployed across four agent harnesses at <current role> is the closest analog I can offer."
 - "The role calls for a Rust engineer who has built production agent infrastructure -- the orchestration server I shipped (Rust, SQL-backed job queue, concurrent multi-agent execution) was built to that brief in a different setting."
 
-(These are shape illustrations only. The actual opening must use phrasing drawn from the candidate's resume + library, not these example shapes verbatim.)
+**Director-level (strategic-positioning openings):**
+
+- "The Director of Engineering search at <Company> is, from the public material around it, a consolidation play -- three formerly-independent teams folding into one platform org under a single director. The closest parallel in my own history is the 18-month consolidation I led at <prior company>, which is where the operating muscle for this kind of work lived for me."
+- "<Company>'s recent reorganization put the Director of AI Platform role directly under the CTO with a mandate to ship the first revenue-bearing product on the new stack within nine months -- the operational pattern (small senior team, executive-direct cadence, hard external deadline) matches the one I ran at <prior company> when we shipped <product> on a similar timetable."
+- "The Head of Product Engineering opening at <Company> is unusually scope-defined for a public posting -- 22 engineers, $5M opex, two-quarter delivery commitment on the new agent platform. I have run a team of comparable size and budget through a similarly constrained delivery before, and the muscle that mattered most was the one for cutting scope deliberately rather than negotiating extensions."
+
+(These are shape illustrations only. The actual opening must use phrasing drawn from the candidate's resume + library, not these example shapes verbatim. Note that director-level openings name a specific organizational situation at the target company before claiming relevance -- this is the strategic-positioning move that distinguishes a director letter from an IC one.)
 ```
 
 ---

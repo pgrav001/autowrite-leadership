@@ -121,14 +121,15 @@ The same binary-eval discipline applies regardless of field. Here are worked exa
 - "Has worked at a senior level?" (too broad)
 
 **Good evals:**
-- "Resume states the headcount the candidate directly owned (naming a specific number, not 'a team')?"
-- "Resume describes at least one decision to restructure, consolidate, or build a team or function -- naming what changed and why?"
-- "Resume ties at least one leadership action to a business outcome (revenue, cost, time-to-market, retention, org velocity) rather than only to an operational output?"
-- "Resume describes at least one person the candidate hired, developed, or promoted -- with a named outcome (e.g., promoted to manager, hired as staff engineer)?"
-- "Resume describes a cross-functional initiative the candidate drove without owning all the functions -- naming the partner functions and the specific outcome?"
-- "Resume includes at least one situation where the candidate navigated significant organizational constraint (reorg, headcount freeze, competing priorities, budget cut) and names the decision made?"
-- "Resume demonstrates progression toward increasing organizational scope (IC → manager → director, or equivalent) rather than lateral movement only?"
-- "Resume names budget or resource ownership at a specific scale (dollar amount, headcount budget, vendor spend) rather than only describing what the team delivered?"
+- "Resume states the candidate's directly-owned headcount at each director-level role with a specific integer (e.g., 'team of 18', '4 EMs and 14 ICs'), not vague scope ('a team', 'multiple engineers', 'the engineering org')?"
+- "Resume describes at least one decision in the last 3 years to restructure, consolidate, build, or wind down a team or function -- naming what changed organizationally and the named outcome (not just the deliverable that came out of it)?"
+- "Resume ties at least one leadership action to a business outcome at the level the company actually screens on (revenue, cost, time-to-market, retention, org velocity, customer acquisition) rather than only to an operational output (shipped feature, hit milestone)?"
+- "Resume describes at least one person the candidate hired, developed, or promoted in the last 5 years -- with the specific outcome named (e.g., 'hired two seniors who became EMs within 18 months', 'promoted three ICs to staff'), not generic mentorship language?"
+- "Resume describes a cross-functional initiative the candidate drove without owning all the functions -- naming the partner functions (Product, Research, Legal, GTM, Finance, etc.) and the specific outcome that resulted?"
+- "Resume includes at least one situation in the candidate's history of navigating significant organizational constraint (reorg, headcount freeze, layoff, budget cut, strategic pivot) and names the decision made under that constraint?"
+- "Resume names budget or resource ownership at a specific scale (dollar amount of opex, headcount budget, vendor spend at $X/year) rather than only describing what the team delivered?"
+- "Resume surfaces at least one external-value differentiator -- something the candidate brings that an internally-promoted candidate at the target company would not have by default (cross-industry transition, scale shift, specific external practice brought in, public artifact like a talk / paper / OSS / podcast presence, board or advisory experience)?"
+- "Resume demonstrates progression toward (or breadth at) director-level scope across multiple roles or companies, rather than a single director title that could read as titular?"
 
 **Director eval anti-patterns to avoid:**
 

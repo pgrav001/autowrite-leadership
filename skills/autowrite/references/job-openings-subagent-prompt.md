@@ -20,6 +20,7 @@ You are researching active job openings at one company for a resume-evaluation p
 
 **Target company:** [COMPANY NAME]
 **Discovery date:** [TODAY'S DATE in YYYY-MM-DD]
+**Director-level search flag:** [yes | no -- inherited from the parent run's `director_level` setting; the parent passes this verbatim. When `yes`, the search prioritizes director-and-above roles and adds the director-specific sources listed under "Where to look" below]
 **Cache lifetime:** 7 days from the discovery date. If a cached `openings-<company>-<date>.json` exists with `discovered_at` within 7 days and the parent did not request a refresh, return the cached results unchanged.
 
 **Candidate context (for filter calibration only -- do not score against this):**
@@ -37,6 +38,16 @@ Search in this order:
 3. **LinkedIn Jobs filtered to the company.** Cross-reference posting dates with the careers page.
 4. **The company's public hiring threads** on the team blog, founder Twitter/X, or other public surfaces.
 5. **Job aggregators** only as a fallback when direct sources are unreachable. Note in the role record which source the data came from.
+
+When the **Director-level search flag is `yes`**, ALSO search these sources, and prefer their findings over the standard sources above when the same role appears on both (director postings on the company's general careers page are often less detailed than the same role on LinkedIn's Director-filter or on industry leadership boards):
+
+6. **LinkedIn Jobs filtered to Director / VP / Head of seniority for this company.** The seniority filter is the primary discovery surface for director searches -- many companies bury director postings on the general careers page but surface them prominently on LinkedIn at the right seniority filter.
+7. **The company's "Leadership" / "Executive Careers" / "Senior Roles" page** (when one exists separately from the general careers page). Some companies maintain a separate hiring surface for director-and-above roles; if you find one, search it before the general careers page.
+8. **Industry leadership job boards** specific to the role's function: examples include `RippleMatch Leadership`, `The Ladders` (engineering leadership), function-specific newsletters that aggregate director searches, and professional-society job boards for the candidate's industry.
+9. **Press and announcement surfaces** that may surface roles before they reach standard boards: the company's most recent investor letter (sometimes references hiring intent for senior roles), industry press about company restructures (often reveals open director-level seats), and the LinkedIn posts of the executive the role would report to (executives often post their own hiring needs).
+10. **Executive recruiter retained-search pages** -- a limited source because retained searches are usually exclusive, but some firms publicly list active engagements for high-profile companies. Check Heidrick & Struggles, Spencer Stuart, Russell Reynolds, Korn Ferry, and any executive-search firms named publicly in connection with this company's recent senior hires.
+
+For director-level searches, the role list returned must include both publicly-posted roles AND any roles surfaced through Sources #9-10 with a `source` field naming the announcement or executive-recruiter origin. Note: these "press" or "recruiter" sources may not have canonical JD URLs -- use the announcement URL as the role's `url` and note in `posted_date_note` that the canonical JD is not publicly listed.
 
 ## What counts as "currently open"
 

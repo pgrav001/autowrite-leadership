@@ -31,6 +31,14 @@ Search for the following, in approximate order of signal value:
 4. **Recent product launches or research releases.** These tell you what the company is *currently* investing in, which is more predictive than their general "we hire smart people" framing.
 5. **Reputable interview reports.** Sites like levels.fyi, Glassdoor, or candidates posting interview experiences. Treat with skepticism (small sample, self-selection) but useful for spotting anti-patterns.
 
+If the role qualifier signals a director or above (contains "director", "VP", "vice president", "head of", "senior manager", "managing director", or "chief [X] officer"), also search for:
+
+6. **Earnings calls, investor letters, and annual reports.** Where the strategic bets live. What problems is this company solving at the executive level? What are the CEO and board saying about org priorities right now?
+7. **LinkedIn org structure research.** What does the reporting chain look like for this role? What level does it report to? What is the existing team composition the director would inherit?
+8. **Leadership team / "About us" pages.** What backgrounds do current directors and VPs at this company have? Builder, operator, or fixer archetype? What pattern does the company hire at director level?
+9. **Press about org restructures, new divisions, and leadership changes.** Was a peer director recently promoted or departed? Is this a new function being built or an existing one being scaled? These signals reveal what organizational problem the company is hiring this director to *solve*.
+10. **Director-level job postings.** Unlike IC postings, director JDs often explicitly state expected headcount, budget ownership, and reporting-line details. These are the most direct signals for building org-scope evals.
+
 Use WebSearch first to identify URLs, then WebFetch to read the most signal-dense ones. Do not over-index on a single source.
 
 ## What to produce
@@ -41,6 +49,7 @@ A profile markdown body in this exact schema (no other top-level sections):
 name: <slugified company name, e.g., "anthropic" or "openai-applied-research">
 company: <Full Company Name>
 role_qualifier: <ROLE QUALIFIER value, or "any">
+director_level: <true if role qualifier signals director, VP, head of, senior manager, or chief officer; omit or false otherwise>
 researched_at: <today's date in YYYY-MM-DD format>
 sources:
   - <full URL>
@@ -53,8 +62,14 @@ sources:
 ## Hiring values
 - (3-6 bullets, drawn from public statements)
 
-## Technical bar
-- (4-8 bullets)
+## Technical bar  ← use for IC and manager roles (director_level: false or absent)
+- (4-8 bullets -- what this company screens for at the role level: specific skills, systems, output expectations)
+
+## Leadership bar  ← use INSTEAD of Technical bar for director-level roles (director_level: true)
+- (4-8 bullets -- what organizational capability does this company screen for at director level? Cover: expected team size/headcount, whether they hire builders vs. operators vs. fixers, P&L or budget ownership expectations, whether ICs or managers report directly, functional scope)
+
+## Stakeholder environment  ← director-level only; omit for IC roles
+- (3-5 bullets -- who does this role manage up to? C-suite, board, external partners? Does it drive cross-functional decisions without owning all the functions? What external-representation expectations exist -- customer relationships, board appearances, public-facing work?)
 
 ## Recent strategic priorities
 - (3-6 bullets, biased toward the last ~6 months)
@@ -85,6 +100,8 @@ EVAL 2: ...
 - **Each eval needs a `Source:` line** citing a specific URL or interview/post that justifies it. If you can't cite a source, the eval shouldn't exist.
 - **No invention.** Don't write evals based on what *should* be true of this company. Write evals based on what their public signals actually show.
 - **No hype mirroring.** Don't reproduce the company's own marketing back at the profile (e.g., "Values curiosity and excellence" -- that's table stakes everywhere and adds no signal). Translate values into observable resume signals.
+- **Set `director_level: true` in frontmatter** if the role qualifier contains any of: "director", "VP", "vice president", "head of", "senior manager", "managing director", "chief [X] officer". This flag propagates to downstream scoring and mutation steps.
+- **For director-level profiles, replace `## Technical bar` with `## Leadership bar` and add `## Stakeholder environment`.** Do NOT write a Technical bar section for director profiles -- it signals the wrong evaluation surface and will cause the recruiter subagent to score against IC-shaped criteria.
 - **No emojis.** No markdown beyond what's shown in the schema.
 
 ## When you have low confidence
@@ -106,6 +123,7 @@ Infer the company shape from the user's invocation and the resume. The same five
 - **Specialist or research-driven organizations** (research labs, R&D-heavy companies, specialist consultancies): prioritize Sources #1, #2, and #3. Public statements from senior practitioners are unusually high-signal because they explicitly describe what they look for, and the careers page often understates the bar.
 - **Early-stage or rapidly-changing organizations** (startups, scale-ups, organizations in active reorg): Source #4 (recent product / project launches / press releases) carries more weight than careers pages -- job descriptions are often stale relative to what the team is actually building.
 - **Distributed or hands-on organizations** (construction firms, agencies, trades, field-services companies): Source #1 (job postings) and Source #5 (interview reports / community forums in the industry) carry the most weight. Engineering-blog equivalents may not exist; substitute industry publications, trade journals, or relevant professional associations.
+- **Director and leadership roles** (role qualifier contains director, VP, head of, senior manager, managing director, or chief): Set `director_level: true` and prioritize Sources #6-10. Source #1 (job posting) is still critical but read it specifically for headcount, budget, and reporting-line language that appears in director postings but not IC postings. Engineering-blog signals (Source #2) are low-weight for director profiles -- what the company builds matters less than how they structure leadership and what organizational problem they're actively hiring this director to solve.
 
 Examples of inferring shape from the invocation:
 

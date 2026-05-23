@@ -112,6 +112,30 @@ The same binary-eval discipline applies regardless of field. Here are worked exa
 - "Resume cites the specific methodology and tooling the role family uses (Agile, Waterfall, Scrum, Jira, Asana, MS Project) with the candidate's role in each ceremony?"
 - "Resume includes at least one cross-functional initiative with named partner functions (legal, finance, design, engineering) rather than working only within one function?"
 
+### Director / VP / Head of function (technology, operations, product, or similar)
+
+**Bad evals:**
+- "Has leadership experience?" (every director-candidate resume passes; signal-free)
+- "Strong manager?" (subjective; not measurable from a document)
+- "Strategic thinker?" (vague; unverifiable from a resume)
+- "Has worked at a senior level?" (too broad)
+
+**Good evals:**
+- "Resume states the headcount the candidate directly owned (naming a specific number, not 'a team')?"
+- "Resume describes at least one decision to restructure, consolidate, or build a team or function -- naming what changed and why?"
+- "Resume ties at least one leadership action to a business outcome (revenue, cost, time-to-market, retention, org velocity) rather than only to an operational output?"
+- "Resume describes at least one person the candidate hired, developed, or promoted -- with a named outcome (e.g., promoted to manager, hired as staff engineer)?"
+- "Resume describes a cross-functional initiative the candidate drove without owning all the functions -- naming the partner functions and the specific outcome?"
+- "Resume includes at least one situation where the candidate navigated significant organizational constraint (reorg, headcount freeze, competing priorities, budget cut) and names the decision made?"
+- "Resume demonstrates progression toward increasing organizational scope (IC → manager → director, or equivalent) rather than lateral movement only?"
+- "Resume names budget or resource ownership at a specific scale (dollar amount, headcount budget, vendor spend) rather than only describing what the team delivered?"
+
+**Director eval anti-patterns to avoid:**
+
+- **IC-shaped evals on a director profile.** "Resume describes a specific system the candidate built" is an IC eval. If the director profile contains mostly these, the recruiter subagent will score the candidate's org-scope bullets as failures (they don't describe shipped systems) and technical bullets as passes -- exactly backwards.
+- **Title-gatekeeping.** "Has a Director title" is not a useful eval. Many strong director-level contributors held VP or "Head of" titles. Eval the scope, not the title.
+- **Evals that collapse org scale into a pass/fail on a single dimension.** "Managed 10+ people" is gameable. "Resume describes both the team size AND at least one specific thing that changed because of how the team was organized" is not.
+
 ---
 
 ## common mistakes when researching profiles

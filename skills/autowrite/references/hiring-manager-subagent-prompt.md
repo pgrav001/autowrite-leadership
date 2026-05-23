@@ -46,6 +46,7 @@ company: <Full Company Name>
 role_qualifier: <Full role title>
 jd_url: <URL>
 hiring_manager_view: true
+director_level: <inherit from parent company profile; true if parent has director_level: true>
 parent_company_profile: <company-slug>
 researched_at: <YYYY-MM-DD>
 sources:
@@ -61,8 +62,14 @@ The `hiring_manager_view: true` flag signals to the recruiter subagent that it s
 ### Hiring values
 - 3-6 bullets. Lead with values the JD itself emphasizes (read the "what we're looking for" or "you'll thrive here" sections of the JD). Then fall back to company-level values from the company profile. Each bullet should be one sentence with the source cited inline if non-obvious.
 
-### Technical bar
+### Technical bar ← IC and manager roles only (`director_level: false` or absent in the parent company profile)
 - 4-8 bullets. The first 2-3 should be inherited from the company profile (the company-bar). The remaining bullets are role-specific, drawn from the JD's "responsibilities" and "requirements" sections.
+
+### Leadership bar ← director-level roles only (`director_level: true` in the parent company profile)
+- Replace `## Technical bar` with this section. Inherit 2-3 org-scope bullets from the company profile's `## Leadership bar`. Add role-specific bullets drawn from the JD, focusing on: reporting structure (who the role reports to, who reports to it), stated headcount or budget ownership, specific organizational problem the JD describes ("build out the X function", "scale from Y to Z engineers", "own the relationship with [partner]"), and any leadership-archetype language the JD uses (builder, operator, player-coach, etc.).
+
+### Stakeholder environment ← director-level roles only (`director_level: true` in the parent company profile)
+- Inherit from the company profile's `## Stakeholder environment`. Add any JD-specific stakeholder details: named executives the role interfaces with, customer or partner-facing scope, board or investor-facing responsibilities.
 
 ### Recent strategic priorities
 - 3-6 bullets. Mostly inherit from the company profile. Add 1-2 role-specific priorities if the JD explicitly references a current initiative ("we're building X to solve Y").

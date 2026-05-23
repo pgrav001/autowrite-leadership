@@ -258,6 +258,19 @@ The lock-and-branch design recognizes that different companies have divergent hi
    - Generic resume cliches ("results-driven," "passionate about")
    - Adding a claim that isn't true -- recruiter subagents may pass on it but a real interviewer will catch you
 
+   **When the active profile has `director_level: true`, apply this additional mutation discipline:**
+
+   Additional good mutations for director profiles:
+   - Lead with organizational scope before output: "Led product org of 18 across 4 teams" should precede what shipped, not follow it
+   - Convert technical-implementation bullets into organizational-decision bullets: "Decided to consolidate X and Y into a unified platform, reducing team count from 3 to 1 and shipping in N months" -- the decision and its org consequence are the signal, not the implementation details
+   - Add an executive summary if absent: director resumes require a 3-5 line summary naming org scope, functional arc, and strategic lens; if the resume lacks one, this is the first mutation to make
+   - Surface the title-progression arc: if the resume shows IC → manager → director, make that trajectory explicitly legible in the summary or structure
+   - Name headcount, budget, and resource scope explicitly: "team of 14" and "$3M opex" are director-level equivalents of an IC's shipped-system evidence -- they don't appear unless deliberately surfaced
+   - Add a cross-functional initiative with named partner functions and a business outcome: this is load-bearing for cross-functional-reach evals
+
+   Additional bad mutations for director profiles:
+   - Adding IC-level technical specificity to bullets that are already working at the right organizational abstraction level. If the active profile is `director_level: true`, deprioritize mutations that add stack names, system names, or implementation details to bullets that already demonstrate org scope -- that downconverts the signal, it doesn't improve it.
+
    **Using the supplementary context library.** If Step 1.1 loaded `bullets/`, `context/`, `interview-notes/`, or `narratives/` from the resume's parent directory, those files are your factual library for this mutation step. When an eval flags a gap that the resume doesn't address but the supplementary library does, pull the relevant phrasing from the library into the resume mutation. Cite which library file the phrasing came from in the changelog entry (e.g., `Source: bullets/meta-ise.md`). Anything not present in the resume OR the library is not yet "stated" -- flag it as a question to the candidate in the changelog (e.g., `Candidate question: did you ship a fine-tuning workflow? Not in resume or library.`) rather than fabricating.
 
 4. **Branch the working file per active profile.** If multiple profiles are active, maintain one mutation track per profile so mutations don't bleed across companies whose bars genuinely differ. The working files live at:

@@ -113,6 +113,72 @@ Each round entry has: a topic name, a short purpose statement, an opening questi
 
 ---
 
+## Director-level core rounds (use instead of or in addition to the default 5-round set for candidates targeting director, VP, head of, or senior manager roles)
+
+For director-level candidates, the default 5-round set is IC-weighted. Replace Personal Projects with Team Building, and add Strategic Decisions and Organizational Adversity. Leadership & People Management (below) becomes a core round, not supplementary. The resulting director-default set is: Team Building + Current Role + Strategic Decisions + Organizational Adversity + Cross-Functional Influence.
+
+---
+
+### Round: Team building (director-level core)
+
+**Purpose:** Surface who the candidate hired, how they developed people, and what their org looks like now because of their decisions. This is the most underdocumented signal in director resumes -- candidates remember what shipped, not who they grew.
+
+**Opening question:** "Tell me about the team you're most proud of building. Not the work the team did -- the team itself. Who are they, how did you find them, and what is each of them doing now?"
+
+**Follow-ups:**
+- "Tell me about the hire you're most proud of -- someone you identified who wasn't obvious, and what happened to them."
+- "Tell me about someone you inherited who wasn't working out. What did you do?"
+- "What's your hiring bar? What do you look for that other people miss?"
+
+**When to use:** All director-level candidates. Almost always underdocumented -- even candidates who did significant team-building tend to undersell it.
+
+---
+
+### Round: Strategic decisions (director-level core)
+
+**Purpose:** Surface the decisions -- not the deliverables. Directors are screened on judgment, and judgment is only visible in decisions made under constraint. "What shipped" is IC signal. "What I decided to build, not build, fund, cut, or restructure, and why" is director signal.
+
+**Opening question:** "Tell me about a significant decision you made in the last two years that you can't fully attribute to your manager's direction. Something where you were the one who framed the options, picked the path, and owned what happened next."
+
+**Follow-ups:**
+- "What were the options you considered and rejected? Why did you rule them out?"
+- "Who did you have to convince? What was the resistance, and how did you handle it?"
+- "Looking back, was it the right call? What would you do differently?"
+
+**When to use:** All director-level candidates. Particularly important for candidates whose current resume only documents deliverables -- this round is where the decision-making evidence surfaces.
+
+---
+
+### Round: Organizational adversity (director-level core)
+
+**Purpose:** Capture how the candidate led when the org was under pressure: reorgs, headcount freezes, budget cuts, competing priorities, strategic pivots. This is where director-level behavioral signal lives -- anyone can lead when resources are unconstrained.
+
+**Opening question:** "Tell me about a time when something significant changed in the organization -- a reorg, a budget cut, a strategic shift -- that directly affected your team. Walk me through what you did."
+
+**Follow-ups:**
+- "What did you tell your team? What did you not tell them?"
+- "What did you have to stop doing, and how did you decide what to cut?"
+- "What would the outcome have been if you'd handled it differently?"
+
+**When to use:** All director-level candidates. Skip only if the candidate has spent their entire career at a single hyper-stable organization with no documented turbulence.
+
+---
+
+### Round: Cross-functional influence (director-level core)
+
+**Purpose:** Surface how the candidate drove outcomes across functions they didn't own. Director-level impact is measured in cross-functional reach as much as within-team output -- what changed because of the candidate's influence, not just their reports' work.
+
+**Opening question:** "Tell me about a time you drove a significant outcome that required getting alignment across teams or functions you didn't control. What was the outcome, who was in the room, and what was your specific role in making it happen?"
+
+**Follow-ups:**
+- "Where was the resistance? What did it take to get the key holdout on board?"
+- "What would have happened if you hadn't pushed for this?"
+- "Is there anything you'd do differently to build that kind of cross-team leverage earlier?"
+
+**When to use:** All director-level candidates. Especially important for candidates whose resume reads as within-team -- this round surfaces the influence that doesn't show up in feature-level deliverables.
+
+---
+
 ## Supplementary rounds (use as round 6+ or substitute for core rounds when relevant)
 
 ### Round: Leadership and people management
@@ -121,7 +187,7 @@ Each round entry has: a topic name, a short purpose statement, an opening questi
 
 **Follow-ups:** size of team, span of control, specific person they helped grow, specific decision they made about staffing or scope.
 
-**When to use:** Candidates targeting Senior+ / Staff+ / management roles, or whose work is meaningfully cross-functional even at IC level.
+**When to use:** Candidates targeting Senior+ / Staff+ / management roles, or whose work is meaningfully cross-functional even at IC level. For director-level candidates, use Team Building (director-level core) instead -- it goes deeper on the same surface.
 
 ---
 
@@ -197,3 +263,19 @@ The Round 0 narrowing does not apply. Use the heuristics below.
 5. Personal Projects to surface outside-work signals.
 
 The default 5-round set should always feel coherent -- if a round overlaps heavily with another already-planned round, swap it out for one of the supplementary rounds.
+
+**Director-level candidates (targeting director, VP, head of, or senior manager roles):**
+
+The default 5-round set is IC-weighted. For director candidates, use the Director-level core rounds section above. The recommended director-default set is:
+
+1. **Team Building** -- most underdocumented signal; always run first
+2. **Current Role** -- still essential, but follow-ups should focus on the organizational decisions made in that role, not the technical work shipped
+3. **Strategic Decisions** -- surfaces the judgment evidence that distinguishes directors from senior ICs
+4. **Organizational Adversity** -- captures how the candidate leads under constraint; load-bearing for director hiring panels
+5. **Cross-Functional Influence** -- surfaces reach beyond the candidate's direct org
+
+Deprioritize or skip for director candidates:
+- **Personal Projects** -- side projects are an IC trust signal; for directors they can undermine the organizational-scope narrative. Include only if the candidate has a specific outside-work project that demonstrates leadership or strategic thinking at scale.
+- **Specific Technical Capability** -- valuable for IC depth, noise for director screening unless the role is explicitly a technical director with an IC component.
+
+If the candidate ran Round 0 and answered "needs depth," still use the director-default set for the targeted roles -- just scope each round's questions to the specific role rather than asking generically.

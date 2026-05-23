@@ -13,6 +13,7 @@ The skeleton below is the canonical structure. Do not add sections that aren't h
 name: <slug>
 company: <Full Company Name>
 role_qualifier: <optional, e.g., "AI Engineer / Applied Research" or "any">
+director_level: <true if role qualifier signals director, VP, head of, senior manager, or chief officer; omit or false for IC/manager roles>
 researched_at: <ISO 8601 date, e.g., 2026-05-12>
 sources:
   - <URL or short citation>
@@ -27,7 +28,15 @@ Bullet list of 3-6 explicit hiring values, drawn from public sources (engineerin
 
 ## Technical bar
 
-What this company screens for at the role level. 4-8 bullets. Be specific -- "ships systems end-to-end" beats "strong engineering"; "delivers commercial projects under $5M without surprises" beats "good PM." Reference any named archetypes the company is hiring for if you can find them in their materials.
+**IC and manager roles only** (`director_level: false` or absent). What this company screens for at the role level. 4-8 bullets. Be specific -- "ships systems end-to-end" beats "strong engineering"; "delivers commercial projects under $5M without surprises" beats "good PM." Reference any named archetypes the company is hiring for if you can find them in their materials.
+
+## Leadership bar
+
+**Director-level roles only** (`director_level: true`). Replace `## Technical bar` with this section. What organizational capability does this company screen for at director level? 4-8 bullets. Cover: expected team size and headcount, whether the company hires builders vs. operators vs. fixers, P&L or budget ownership expectations, whether ICs or managers report directly, functional scope. Be specific -- "leads a team of 10-20 engineers" beats "strong people manager"; "owns $5M-$10M opex budget" beats "budget experience"; "built two functions from scratch in the last 5 years" beats "builder mindset."
+
+## Stakeholder environment
+
+**Director-level roles only** (`director_level: true`). 3-5 bullets. Who does this role manage up to (C-suite, board, specific executive)? Does it drive cross-functional decisions without owning all the functions? What external-representation expectations exist -- customer relationships, board or investor appearances, public-facing work, partner relationships? This section gives the recruiter subagent the context to evaluate whether the resume surfaces the right scope of influence.
 
 ## Recent strategic priorities
 
@@ -80,6 +89,8 @@ Before saving a profile, the autowrite loop validates:
 - [ ] Each eval has a `Source:` line citing a real, current public signal
 - [ ] `researched_at` date is set
 - [ ] `sources` frontmatter lists at least 3 URLs or citations
+- [ ] **Director-level profiles only:** `director_level: true` is set; `## Leadership bar` and `## Stakeholder environment` are present; `## Technical bar` is absent
+- [ ] **Director-level profiles only:** at least 3-4 evals target organizational-scope signals (headcount, budget, cross-functional reach, people development, strategic decisions) rather than technical-output signals
 
 If any of these fail, the loop re-spawns the research subagent with the validation feedback.
 

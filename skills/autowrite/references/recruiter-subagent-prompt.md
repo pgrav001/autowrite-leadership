@@ -44,6 +44,14 @@ The following is the resume you are scoring.
 [FULL RESUME MARKDOWN PASTED INLINE]
 <<<RESUME END>>>
 
+### Candidate voice file (optional -- only present when the parent loaded `voice.md`)
+
+If the field below contains content, it is the candidate's verbatim voice patterns + voice notes. Use it to perform a **voice-drift check** on the resume in addition to the profile evals -- see the "Voice-drift check" section below. If the field is empty (`<<<VOICE END>>>` immediately follows `<<<VOICE BEGIN>>>`), skip the voice-drift check entirely.
+
+<<<VOICE BEGIN>>>
+[FULL voice.md MARKDOWN PASTED INLINE, OR EMPTY]
+<<<VOICE END>>>
+
 ## How to score
 
 For each eval in the profile's `## Binary eval criteria` section:
@@ -63,6 +71,24 @@ After scoring, identify:
 - The top 3 **strengths**: things the resume does well from this company's perspective, regardless of which specific evals they map to.
 - The top 3 **gaps**: things the resume is missing or weak on, prioritized by how much they hurt at this company specifically.
 - The **single highest-priority revision suggestion**: one concrete change to the resume that would have the largest positive impact on this profile's evals. Be specific -- name the section, the bullet, the swap.
+
+## Voice-drift check (only when voice.md content was provided)
+
+If the `<<<VOICE BEGIN>>> ... <<<VOICE END>>>` field above contains content, perform this additional check after profile scoring and include the result in the `voice_drift` field of your output. If the field was empty, skip the check entirely and return `"voice_drift": null`.
+
+The voice file captures the candidate's verbatim phrasing patterns + voice notes describing what's distinctive. Use it to identify resume content that drifts from the candidate's documented voice -- not because drift hurts the company's evals, but because resumes that drift from the candidate's voice tend to fail at the interview stage (the candidate can't read it back naturally, and interviewers notice).
+
+How to check:
+1. Sample 8-12 bullets across the resume (skip standardized blocks like Contact and Education).
+2. For each, ask: does the language match the patterns documented in voice.md? Or does it reach for cliches the voice file explicitly flags?
+3. Flag any bullets that drift. Cite the specific voice pattern they violate (or the cliche they reach for).
+
+Score:
+- **`pass`** -- the resume's voice is consistent with voice.md throughout the sample
+- **`mild`** -- 1-2 bullets drift; the rest hold the voice
+- **`significant`** -- 3+ bullets drift, OR a load-bearing bullet (e.g., the summary, the top of the most-recent role) uses a voice the file flags as off
+
+Voice-drift is independent of the profile's binary evals. Report it separately. Do NOT subtract it from `pass_rate_pct` -- that's the profile-eval score and must stay scoped to the profile. Voice-drift is a parallel signal the parent skill uses to decide whether to revise a mutation before keeping it.
 
 ## Output format
 
@@ -100,6 +126,16 @@ Return a JSON-shaped report. Do not return anything else -- no preamble, no post
     "specific_target": "<which bullet, line, or area>",
     "suggested_change": "<what to swap, add, or trim -- one concrete sentence>",
     "expected_eval_impact": "<which eval(s) this would flip from fail to pass>"
+  },
+  "voice_drift": {
+    "score": "pass | mild | significant | null",
+    "flagged_bullets": [
+      {
+        "bullet_excerpt": "<short quote of the drifting bullet>",
+        "voice_pattern_violated": "<which pattern from voice.md or which cliche the bullet reaches for>"
+      }
+    ],
+    "notes": "<optional one-line summary; empty string if score is pass or null>"
   },
   "evaluator_notes": "<optional: any meta-notes about the profile, the resume, or your scoring confidence. Empty string if none.>"
 }

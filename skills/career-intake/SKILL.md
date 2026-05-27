@@ -17,7 +17,7 @@ This is a **human-in-the-loop** skill -- the opposite mode from autowrite. The a
 
 Conduct 5 rounds of focused Q&A about the candidate's career. Each round covers one topic (current role, career arc, flagship project, skills + behavioral signals, personal projects -- adjust to the candidate). At the end of each round, draft bullets and confirm them. Save every round's output to disk before moving to the next so the work is resumable across sessions. After 5 rounds, present an updated resume draft and let the candidate decide whether to loop back for more rounds or hand off to autowrite.
 
-**Output:** Per-round session logs (`interview-notes/<date>-<topic>.md`), itemized bullet libraries (`bullets/<topic>.md`), and an updated resume draft (`revisions/<date>-draft.md`) the candidate can hand to autowrite.
+**Output:** Per-round session logs (`interview-notes/<date>-<topic>.md`), itemized bullet libraries (`bullets/<topic>.md`), a candidate voice file (`voice.md` -- verbatim phrasing + voice notes captured across rounds), and an updated resume draft (`revisions/<date>-draft.md`) the candidate can hand to autowrite.
 
 ---
 
@@ -200,6 +200,9 @@ Stop following up when:
 - The candidate's answers start repeating
 - They explicitly say "I think that's everything on this"
 - Three follow-ups have been asked
+- **The candidate signals you're in the weeds.** Phrases like *"we're getting into the weeds,"* *"orthogonal,"* *"splitting hairs,"* *"this doesn't really matter,"* *"the order doesn't matter,"* are pivot signals -- not invitations to drill deeper. When you see one, acknowledge briefly and move to a different thread (or close the round) rather than asking another follow-up. The three-follow-up budget is a soft cap; the candidate's pivot signal overrides it.
+
+The opposite failure mode is also real: when the candidate is mid-thought and gestures at something they haven't yet explained (a name you don't know, a project you haven't heard of, a decision they hint at), one specific follow-up is exactly the right move. The discipline is: drill when there's substance to extract; pivot when the candidate signals the substance has been extracted.
 
 ### 2c. Reflect back and draft bullets
 
@@ -219,6 +222,7 @@ The drafting rules are strict:
 - **Include quantification only where the candidate gave it.** "14 products in 5 months mostly solo" is quantification the candidate provided. "Many products shipped" is filler -- skip it.
 - **Skip generic resume verbs** ("leveraged", "spearheaded", "drove cross-functional alignment") unless the candidate used them.
 - **Flag underclaims and overclaims.** If the candidate seemed to downplay a 50k-user product, flag it ("you mentioned 50k MAU almost in passing -- this is significant; should we surface it?"). If they overstated something, flag it ("you said 'replaced' but earlier you said the old system still runs in parallel -- want to soften to 'parallel implementation'?").
+- **When the candidate corrects a fact, correct only the fact.** Do NOT also reframe surrounding bullets or re-narrate the arc unless the candidate explicitly asks. A factual correction (a level, a title, a date, a budget figure, a team size) is one change; narrative re-shaping is a separate change that requires the candidate's authorization. Example failure pattern: the candidate corrects a quantification ("my team was 12, not 18"); the assistant fixes the number AND silently softens an adjacent "scaled the org significantly" bullet to "managed a small team." The number correction was authorized; the narrative softening was not, and likely misrepresents what the candidate's work actually was. Stick to the fact. If you think the surrounding narrative should also change, say so out loud and ask -- *"You corrected the team size; should I also update the bullets that framed the org as 'scaled significantly,' or do those still hold as written given the smaller number?"* -- and let the candidate decide.
 
 ### 2d. Iterate on bullets until the candidate signals lock
 
@@ -229,9 +233,28 @@ The candidate corrects, you revise, repeat. When the candidate says some variant
 Before moving to the next round, save:
 
 1. **Session log** at `<output-dir>/interview-notes/<YYYY-MM-DD>-<round-topic-slug>.md` following the schema in [references/session-template.md](references/session-template.md). Include the questions asked, key answers, decisions, anything the candidate said that's worth keeping for future interview prep ("side notes" section).
-2. **Bullet library** at `<output-dir>/bullets/<round-topic-slug>.md` -- just the locked bullets in clean markdown, no Q&A scaffolding.
+2. **Bullet library** at `<output-dir>/bullets/<round-topic-slug>.md` -- just the locked bullets in clean markdown, no Q&A scaffolding. **Frontmatter must include a `source:` field** identifying where each bullet came from -- see the provenance section in [references/resume-ingest-template.md](references/resume-ingest-template.md) for the value vocabulary (`resume | interview-round-N | candidate-confirmed | inferred`). For a bullets file produced by a Q&A round, the file-level default is `source: interview-round-N` where N is the round number; individual bullets can override.
+3. **Voice file** at `<output-dir>/voice.md` -- append any verbatim phrasing the candidate used this round that's distinctive (uncommon verb choices, characteristic hedges, specific framings the candidate reaches for repeatedly, principled-clarity lines, restraint patterns). One section per round, dated, with a short voice note explaining how to deploy each quote in artifacts. If `voice.md` does not yet exist, create it with the schema below; if it does, append a new dated section. Schema:
 
-Announce in chat: "Round [N] locked. Saved session log to `<path>` and bullets to `<path>`. Moving to round [N+1]: [topic]."
+   ```markdown
+   # Candidate voice
+
+   > Verbatim phrasing + voice notes captured across career-intake rounds. Use these as the source for tone, vocabulary, and framing when generating artifacts (resume bullets, cover-letter prose, LinkedIn copy). Downstream tools (e.g., autowrite) may load this file to bias mutations toward voice-consistent phrasing and flag mutations that drift.
+
+   ## From <round-topic> -- <YYYY-MM-DD>
+
+   ### <Short label for the framing or phrase>
+   > *"<Verbatim quote from the candidate, word-for-word.>"*
+
+   **Voice note:** <One short line explaining what's distinctive about it and when to deploy it. Examples: "Use as opening line in cover letters for AI-company roles" / "Characteristic restraint pattern -- preserve when summarizing wins" / "Anchor quote for leadership-bench interview prompts.">
+
+   ### <Next quote>
+   > *"<...>"*
+
+   **Voice note:** <...>
+   ```
+
+Announce in chat: "Round [N] locked. Saved session log to `<path>`, bullets to `<path>`, and appended `<M>` voice entries to `<path>/voice.md`. Moving to round [N+1]: [topic]."
 
 ---
 
@@ -289,8 +312,8 @@ If the bullets at the end read more like the assistant than the candidate -- the
 ## how this connects to autowrite
 
 **Input to career-intake:** the candidate, optionally an existing resume (markdown or PDF).
-**Output of career-intake:** `interview-notes/`, `bullets/`, `narratives/`, and a `revisions/<date>-draft.md` markdown resume.
-**These outputs are exactly what autowrite reads in Step 1.1** as the supplementary-context library. Running career-intake first, then autowrite, gives autowrite a much richer factual library to mutate against than a bare resume markdown could.
+**Output of career-intake:** `interview-notes/`, `bullets/` (with `source:` provenance frontmatter), `narratives/`, `voice.md`, and a `revisions/<date>-draft.md` markdown resume.
+**These outputs are exactly what autowrite reads in Step 1.1** as the supplementary-context library. Running career-intake first, then autowrite, gives autowrite a much richer factual library to mutate against than a bare resume markdown could. The `voice.md` file (when present) biases autowrite's mutation engine toward voice-consistent phrasing and surfaces mutations that drift from the candidate's actual voice.
 
 The output shape is **identical** whether the candidate ran Round 0 + Q&A, Round 0 only (up-to-date branch), or the default 5-round flow with no resume. The same `bullets/` files exist in the same locations with the same shapes -- the only difference is whether the bullets came from the resume seed, from interview rounds, or both (with interview bullets appended under `## From interview <date>` subheadings). Autowrite Step 1.1 needs no changes to consume any of these flows; it globs `bullets/*.md` and reads each file's content regardless of provenance.
 

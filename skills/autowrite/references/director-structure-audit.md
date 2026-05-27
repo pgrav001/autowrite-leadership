@@ -17,9 +17,11 @@ Director resumes fail more often for structural reasons than for bullet-level re
 3. **Headcount and budget invisible** -- the candidate's actual scope (team of 18, $4.2M opex) appears nowhere in the resume, even when they own it. Recruiters infer scope downward by default; if you don't surface yours, they assume it's smaller than it is.
 4. **Title progression buried** -- the candidate's IC -> manager -> director arc isn't visible at a glance. A reader has to read all four roles to see it.
 5. **No external-value differentiator** -- for any director search where an internal candidate is in play (most of them), the resume needs to surface what the external candidate brings that an internal promotion would not. Cross-industry experience, scale at a different stage of company, specific external practices, public artifacts.
-6. **No "Selected Accomplishments" or "Career Highlights" section** -- 8+ year careers benefit from a non-chronological top section that surfaces the 3-5 strongest wins. Without it, a recruiter who only reads the most-recent role misses the candidate's strongest work.
+6. **No "Selected Accomplishments" or "Career Highlights" section** -- 8+ year careers benefit from a non-chronological top section that surfaces the 3-5 strongest wins. Without it, a recruiter who only reads the most-recent role misses the candidate's strongest work. **First-of-kind outcomes** ("first," "founded," "established") are especially high-signal at director level and belong here when they exist.
+7. **Unbacked high-signal claims** -- a quantified outcome, scope number, or first-of-kind framing in the resume that the supplementary library doesn't document is an **overclaim risk** at director level. Director reference checks and panels surface specifics; a claim the candidate can't back up damages credibility more than a softer defensible claim would.
+8. **Maximized framing without bounded counter-claims** -- "permanently raised the ceiling" / "fundamentally transformed" / "rebuilt" without acknowledging what didn't land reads as too tidy. Director-level audiences pattern-match for *real* leaders, not flawless ones. Bounded framing ("X landed; Y did not") is more credible than maximized framing when the supplementary library supports the bounding.
 
-The line-level mutation loop can fix bullets. It cannot add a missing section, re-order the resume, or convert output-first framing to scope-first framing at the section level. Those changes need to happen before the loop runs.
+The line-level mutation loop can fix bullets. It cannot add a missing section, re-order the resume, convert output-first framing to scope-first framing at the section level, cross-reference claims against the supplementary library, or detect when maximizer language needs bounding. Those changes need to happen before the loop runs.
 
 ---
 
@@ -58,6 +60,19 @@ For each check below: detect the pattern in the resume's markdown, score it as `
 **Weak (one or two of the three scope/arc/lens dimensions are present but not all three):** finding "executive summary is present but underspecified" -- proposed mutation: revise the summary to add the missing dimension(s), drawing from the candidate's current role bullets and title progression.
 
 **Missing (no block at all):** finding "no executive summary" -- proposed mutation: add a summary block at the top, drawing scope from the current role's bullets and supplementary library (if loaded), arc from the title progression, and lens from the role qualifier the user provided OR the most-recent role's strategic focus.
+
+**Sub-check 1b: paired-thesis detection.** Some candidates have **two related-but-distinct top-level positioning claims** that work better together than collapsed -- for example, one claim that frames a specific consumer of the work (a particular audience) and a second claim that frames the broader applicability of the same work. When the supplementary library (`narratives/`, `bullets/`, voice file) surfaces multiple distinct positioning claims that both have evidence backing them, surfacing both in the summary is more credible than picking one and dropping the other.
+
+Detection signals:
+- The supplementary library has two or more "thesis-like" sentences (sentences in the candidate's voice that read as positioning statements, not as accomplishments)
+- The candidate passed `core_through_line` as a paired array at invocation
+- The summary currently surfaces only one of the candidate's documented positioning claims
+
+**Weak (one claim is surfaced; another is documented in the library but missing from the summary):** finding "summary captures one positioning claim but the candidate documents a second" -- proposed mutation: revise the summary to include both, preserving the candidate's exact phrasing for each. Use language like "...and increasingly..." or "...which lands at two altitudes..." to bridge them.
+
+**Missing (no positioning claim surfaced AND the library has two):** combine with the missing-summary finding -- the proposed summary should include both claims.
+
+Do NOT propose collapsing two distinct claims into a single sentence. If the candidate's documented claims are genuinely distinct, the summary should hold both.
 
 ### Check 2: Scope metadata at role headings
 
@@ -133,11 +148,64 @@ This is the check that is most commonly missing AND most often the difference be
 
 **Missing AND the candidate has under 8 years of experience:** skip this finding. The candidate's chronological experience section is sufficient.
 
+**Sub-check 6b: first-of-kind detection.** First-of-kind outcomes ("first," "founded," "established," "created the X function," "permanently changed," "no precedent before this") are among the highest-signal patterns for director-level resumes -- they are exactly what executive recruiters and search committees pattern-match for, and they distinguish a director who shaped their discipline from a director who operated well within it.
+
+Scan the resume body AND the supplementary library for first-of-kind framing:
+- Bullets containing "first," "founded," "established," "built the [function/role/practice] from scratch," "created the [X] [team/discipline/role]," "no [Y] existed before"
+- Promotion-related: "first [level] in the [discipline/company]," "promoted the first [level] in the [scope]"
+- Function-creation: "advocated for and built the [function]," "designed and stood up the [team/practice]"
+
+If first-of-kind outcomes exist in the resume or library but are NOT surfaced in the Career Highlights section (or there is no Career Highlights section), this is a finding regardless of the candidate's years of experience:
+
+**Finding "first-of-kind outcomes not surfaced as highlights":** proposed mutation -- promote the strongest 1-3 first-of-kind outcomes into Career Highlights entries (creating the section if it doesn't exist). Each entry should lead with the first-of-kind framing and quantify the scope (discipline, company, region, function -- whatever is the legitimate scope of the "first").
+
+Do NOT propose first-of-kind framing for outcomes that don't have it in the source material. If the candidate built a team but didn't characterize it as "first," do not invent the framing -- that's an overclaim.
+
 ---
+
+### Check 7: Claim provenance
+
+For director-level resumes, **overclaim is a higher-stakes failure mode than understatement.** Director-level reference checks and structured panel interviews surface specifics; a claim that the candidate cannot back up in conversation -- even an inadvertent one -- damages credibility more at this level than a softer but defensible claim would.
+
+**Detection:**
+- For each high-signal claim in the resume (quantified outcomes, first-of-kind framings, scope numbers, named org-level decisions), check whether the claim has backing in the supplementary library (`bullets/`, `interview-notes/`, `narratives/`).
+- A claim is **backed** when the supplementary library contains the same quantification, the same outcome, or the same scope -- with provenance grade 1 (`candidate-confirmed`), 2 (`interview-round-N`), or 3 (`resume`).
+- A claim is **inferred or unbacked** when no supplementary library file documents it OR the only documenting file is provenance grade 4 (`inferred`).
+
+**Pass criteria:**
+- Every high-signal claim in the resume is backed by at least one grade-1, grade-2, or grade-3 source in the supplementary library (or in the resume's own body -- the resume itself counts as grade-3 evidence for claims it makes).
+
+**Weak (1-2 claims are inferred-grade or unbacked):** finding "some high-signal claims lack documented backing" -- proposed mutation: for each, either soften the claim to the strongest defensible version OR flag it as a candidate question (`Candidate question: the bullet "<X>" claims <Y>; the supplementary library does not document the specific quantification. Confirm or soften before publishing.`). Do NOT propose deleting the bullet outright -- the candidate can confirm and keep it.
+
+**Missing (3+ claims are inferred-grade or unbacked, OR a load-bearing claim is unbacked):** finding "multiple high-signal claims lack documented backing -- overclaim risk" -- proposed mutations: soften each unbacked claim to its strongest defensible version, and surface each as a candidate question for confirmation. For the load-bearing case (e.g., a summary statement, a Career Highlights entry, the top bullet of the current role is unbacked), DO recommend the candidate review before any submission -- the audit cannot proceed past this finding without explicit user acknowledgment.
+
+**No supplementary library loaded:** skip this check entirely. Without a library to cross-reference, the resume's own claims are taken as the candidate's authored position.
+
+**Important:** the goal of Check 7 is NOT to weaken the resume. It is to ensure every kept claim has a paper trail the candidate can stand behind in an interview. A soft claim with a citation is stronger than a maximal claim with no backing.
+
+### Check 8: Honest bounded framing
+
+The most credible version of any claim names both what worked **and** what was attempted but didn't land. Director-level audiences pattern-match for *real* leaders, not flawless ones. Resumes that read as too tidy -- every initiative a clean win, every promotion part of a pattern, no bounded counter-claims anywhere -- read as either junior or as papered-over.
+
+**Detection:**
+- Scan the resume for **maximizer language without bounded counter-claims**: "permanently," "fundamentally," "transformed," "first and only," "raised the ceiling," "rebuilt," "completed the transition."
+- For each instance, check the supplementary library (`bullets/`, `interview-notes/`, `narratives/`) for evidence that something *adjacent to* the maximal claim didn't land -- a related program that got crowded out, a follow-on phase that wasn't completed, a transferred-responsibility piece that hasn't been picked up.
+- A bullet that says "permanently raised the discipline's ceiling" is more credible as "precedent broken; general archetype documentation didn't formalize before the team's priorities shifted" -- if the supplementary library supports the second framing.
+
+**Pass criteria:**
+- Maximizer claims in the resume have bounded counter-claims when the supplementary library supports them, OR the maximizer claim is genuinely complete (the candidate explicitly documented in the library that no counter-claim exists).
+
+**Weak (maximizer language is used in 1-2 places where the supplementary library documents a bounded counter-claim that's missing from the resume):** finding "maximizer claims missing their bounded counter" -- proposed mutation: revise each affected bullet to the "X landed, Y did not" form, drawing the counter-claim from the supplementary library. Example pattern: instead of "Permanently raised the discipline's ceiling -- created a precedent + documented the archetype for future promotions," use "Promoted the first [level] in the discipline (precedent landed). General archetype documentation for future cases did not formalize -- crowded out by execution priorities; the precedent itself remains the durable outcome."
+
+**Missing (3+ maximizer claims missing their counters, OR the resume's summary is a string of maximizer claims with no bounded language anywhere):** finding "resume reads as maximized without acknowledging what didn't land" -- proposed mutations: revise the strongest 2-3 affected bullets to the bounded form, and bridge into the summary with one line acknowledging a documented constraint or counter ("Operating model still evolving in [area]" / "Some adjacencies remain in progress").
+
+**No supplementary library loaded:** skip this check entirely. Honest bounded framing requires a documented counter-claim; without one, "bounding" the claim becomes invention.
+
+**Important:** the bounded version must be true. Do NOT invent counter-claims to soften a maximal claim. The supplementary library is the source of every bounded counter the audit proposes. If the library doesn't support a counter, the maximal claim stays (or moves to Check 7's "candidate question" path if its backing is also thin).
 
 ## How to present findings
 
-After all six checks complete, post a single chat message:
+After all eight checks complete, post a single chat message:
 
 > Director-level structural audit (resume: `<filename>`):
 >

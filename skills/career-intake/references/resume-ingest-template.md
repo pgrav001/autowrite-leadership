@@ -116,6 +116,7 @@ slug: <role-slug>
 current_role: <true | false>
 seeded_from: <relative path to the resume markdown>
 seeded_at: <YYYY-MM-DD>
+source: resume
 ---
 
 # <Role title> -- <Company> (<dates>)
@@ -127,7 +128,38 @@ seeded_at: <YYYY-MM-DD>
 
 The marker line `<!-- career-intake:round-0-seed -->` is the re-ingest detection signal. Do NOT omit it.
 
-The frontmatter is read by downstream tools (currently informational; autowrite Step 1.1 may consume it later for source attribution). Format must be valid YAML.
+The frontmatter is read by downstream tools (informational + provenance-aware -- autowrite Step 1.1 reads `source:` to bias the mutation engine toward source-grade phrasings). Format must be valid YAML.
+
+### The `source:` field -- bullet-level provenance
+
+Every `bullets/*.md` file carries a `source:` value in frontmatter. This field tells downstream tools (and future career-intake sessions) where each bullet came from, so the mutation engine can weight by provenance grade and so the candidate has a paper trail when an interviewer asks where a claim originated.
+
+Vocabulary (use these values exactly):
+
+| Value | Meaning | Use when |
+|---|---|---|
+| `resume` | Verbatim from the candidate's existing resume markdown | Round 0 seeded bullets, before any Q&A round has touched the file |
+| `interview-round-<N>` | Locked in a specific Q&A round (`interview-round-1`, `interview-round-2`, etc.) | Bullets produced by Step 2c/2d drafting + locking |
+| `candidate-confirmed` | Explicitly confirmed by the candidate in chat outside a formal round (e.g., a side conversation, a follow-up message between rounds) | Mid-session edits or async confirmations |
+| `inferred` | Derived by the assistant from other captures, NOT explicitly confirmed by the candidate | **Rare and provisional** -- inferred bullets must be flagged in chat at write time so the candidate can confirm or correct; the field stays `inferred` until they do. Downstream tools (autowrite) deprioritize these and surface them as candidate questions rather than mutation source material |
+
+### File-level vs bullet-level provenance
+
+The frontmatter `source:` is the **file-level default** -- the provenance of most bullets in the file. Individual bullets can override the default with an inline annotation when the source differs (e.g., a single bullet was confirmed in chat after the round closed):
+
+```markdown
+- <Bullet from the round, no annotation -- inherits file-level source>
+- <Another bullet, no annotation> <!-- source: candidate-confirmed -->
+- <A third bullet -- explicitly inferred and not yet confirmed> <!-- source: inferred -->
+```
+
+Tools read the inline annotation first; if absent, they fall back to the file-level frontmatter `source:`. This keeps the common case (most bullets share a source) cheap to write while preserving per-bullet provenance when it matters.
+
+### Append rule for per-role files mixing seed + interview bullets
+
+When a Q&A round appends interview bullets to a seed file (under a `## From interview <date>` heading -- see "How Round 0 output interacts with later Q&A rounds" below), the file-level frontmatter `source:` STAYS `resume` -- it reflects the original seed. Each appended `## From interview <date>` block becomes a sub-region with its own implicit provenance: every bullet under that heading is `interview-round-<N>` unless individually annotated otherwise. Downstream tools that parse the file should treat the body above the first `## From interview` heading as `source: resume` and each subsequent dated block as `source: interview-round-<N>` per the heading's accompanying round number.
+
+This keeps the file readable as a single per-role bullet library while preserving accurate per-region provenance.
 
 If a role had no bullets in the resume (just a title + dates), still create the file with the frontmatter and a body of `<!-- no bullets in source resume; pending Round X Q&A -->`. The file presence is what matters; the candidate may later flag this role for depth.
 
@@ -141,6 +173,7 @@ Each is a single markdown block with the marker line and one-line frontmatter, t
 section: <Resume's exact section name, e.g., "Technical Skills">
 seeded_from: <relative path to the resume markdown>
 seeded_at: <YYYY-MM-DD>
+source: resume
 ---
 
 <Verbatim section content from the resume, preserving headings, lists, paragraph structure.>

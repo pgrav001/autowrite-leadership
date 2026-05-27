@@ -54,6 +54,17 @@ You are drafting a cover letter for one specific job opening. The letter ships a
 
 **Director-level flag (set from the hiring-manager profile's `director_level` frontmatter):** [yes | no]
 
+**Core through-line(s) (optional; passed from the parent skill's invocation):** [list one or two strings, or empty]
+
+If one or more through-line strings are passed:
+
+- **You MUST weave each through-line into the opening paragraph** (verbatim or close-paraphrase that preserves the candidate's phrasing). For a single through-line, the opening paragraph should anchor the candidate's positioning on it before pivoting to the role-specific evidence. For paired through-lines, both must appear in the opening or the first body paragraph -- never collapse them into one.
+- **Subsequent paragraphs do the eval-echo work** as described in the letter shape below.
+- **Do NOT paraphrase the through-line into your own framing.** The candidate has authored the through-line as a specific positioning claim. Rewording it -- even to what sounds like a tighter version -- strips the candidate's voice from the sentence the entire letter is anchored on. The exact wording the candidate passed is the wording that goes in the letter.
+- **Through-line + JD coherence:** if the through-line and the JD-specific evals are in tension (e.g., the through-line frames the candidate as an infrastructure builder but the JD is for a product-management role), the letter should acknowledge the through-line first, then explicitly bridge to the role's responsibilities ("...and the bridge to <JD framing> is..."). Do not drop the through-line in favor of JD fit; the user passed it as a non-negotiable.
+
+If no through-line is passed, proceed with the standard opening shape below.
+
 ## Your output
 
 Return the cover letter body as markdown. Return ONLY the markdown -- no preamble, no closing notes, no rationale paragraph. The parent skill will save it.

@@ -136,6 +136,18 @@ The same binary-eval discipline applies regardless of field. Here are worked exa
 - **IC-shaped evals on a director profile.** "Resume describes a specific system the candidate built" is an IC eval. If the director profile contains mostly these, the recruiter subagent will score the candidate's org-scope bullets as failures (they don't describe shipped systems) and technical bullets as passes -- exactly backwards.
 - **Title-gatekeeping.** "Has a Director title" is not a useful eval. Many strong director-level contributors held VP or "Head of" titles. Eval the scope, not the title.
 - **Evals that collapse org scale into a pass/fail on a single dimension.** "Managed 10+ people" is gameable. "Resume describes both the team size AND at least one specific thing that changed because of how the team was organized" is not.
+- **Evals that implicitly reward Highlight addition over Highlight substitution.** When an eval gap surfaces ("resume does not foreground X"), the recruiter subagent will often suggest "add a Highlight covering X." On a length-constrained director resume this is the wrong default. See the Highlights-management note below.
+
+### Highlights management (director-level mutation rule)
+
+Director-level resumes are length-constrained. Most land at 2 pages with a 6-bullet "Selected Highlights" section at the top. When a new Highlight is genuinely needed (typically because an eval gap surfaces that body bullets can't be skimmed for), the right move is **cut-before-add**, not append.
+
+- **The cut candidate is anything whose proof also lives at body altitude.** If a Highlight's underlying claim is also stated in the Experience bullets, the Highlight is optional -- cutting it from skim altitude does not lose the claim, only its top-of-doc visibility.
+- **The load-bearing Highlights are the ones whose claim has no body-level proof.** A Highlight stating a precedent or first-of-kind outcome (e.g., "established the first such function within the org") with no Experience-section restatement is load-bearing: cut it and the claim disappears entirely. Don't cut load-bearing Highlights to make room for net-new ones.
+- **The rule applies per opening, not per candidate.** What's load-bearing for an AI lab is different from what's load-bearing for a healthcare org. The cut candidate is the Highlight whose claim is least relevant for *this opening*, not the Highlight that's least flattering to the candidate.
+- **Reflected in the mutation loop:** when a per-experiment mutation would push the Highlights count above 6 (or above the candidate's stated maximum), the loop should prefer a swap mutation -- substitute the new bullet for a less-relevant existing one -- rather than an additive mutation. Append mutations on the Highlights section should be flagged as "Highlights overflow" in the changelog if they push past the configured maximum.
+
+The framing is **spend Highlights on what THIS opening screens for, not on what's most flattering across all openings**. Across a multi-company autonomous run, this means per-company variants will have different Highlight sets even when the underlying body bullets are identical -- and that is the correct behavior.
 
 ---
 

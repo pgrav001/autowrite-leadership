@@ -816,6 +816,83 @@ If a resume "passes" all evals but doesn't actually read better -- the evals are
 
 ---
 
+## manual one-shot review mode
+
+The default flow above is a multi-hour autonomous loop -- the right tool when scoring against several target companies in parallel. Some users want the discipline of the eval framework without the loop overhead: a single opening, a single audit, a single variant draft, no convergence cycles.
+
+This section documents that mode. It is structurally a subset of the full flow: the same hiring-manager profile build, the same binary eval scoring, the same per-mutation discipline -- run once, by hand, against one JD.
+
+### When to use this mode
+
+- Single-opening audit where the user has one specific JD in front of them and wants a fast directional read on how their current resume scores.
+- Tight-deadline tailoring where the autonomous loop's run time isn't available.
+- High-touch openings (director and above; sensitive applications) where the user wants to author every change personally and the autonomous mutation loop would be reverted line-by-line anyway.
+- Methodology-only use: the user wants the eval framework and gap analysis but plans to take the actual editing into a different tool (Word, Google Docs, a designed layout system).
+- After substrate work in `career-intake` when the user has a single target opening and the autonomous-loop's multi-company convergence is overkill.
+
+**When NOT to use this mode:**
+
+- Multi-company target sets -- use the autonomous loop.
+- Profile development / research at scale -- the autonomous loop's caching is far more efficient.
+- When eval quality is uncertain. The autonomous loop's variance-checking and re-research feedback catches bad evals; manual one-shot mode lands whatever the first profile draft produces.
+
+### What manual one-shot mode does
+
+1. **Read the JD.** Either passed in by the user or fetched from a URL.
+2. **Read the current resume** (markdown form; convert from PDF per Step 1.0 if needed).
+3. **Build the hiring-manager profile in a single pass.** Follow the schema in `references/hiring-manager-subagent-prompt.md` -- 8-15 binary evals, half inherited from a company-bar shape, half JD-derived with passage citations. If no company-bar profile exists, derive a slim one from public signals (the company's careers page, recent product launches, a blog post or two) or skip inheritance and run 8-12 JD-derived evals.
+4. **Score the current resume against the profile.** Walk eval-by-eval, mark each PASS / PARTIAL / FAIL, cite the resume evidence (or the absence of it). Compute the binary pass rate (treating PARTIAL as FAIL per the eval-guide's golden rule); compare against the 90% lock threshold.
+5. **Identify the top 3 cross-eval gaps.** Surface what the resume would need to change to move from current score to lock-threshold.
+6. **Draft a variant** addressing the top 3 gaps -- one specific edit per gap, anchored to evidence the user has in their substrate or elsewhere. Do not invent claims. If a gap can only be addressed by a claim the substrate doesn't support, flag it as a candidate question and do not draft the edit.
+7. **Present the audit + variant to the user** as a single report: score, evals table, top-3 gaps, proposed revisions per gap, recommendation for what to keep untouched.
+
+### What manual one-shot mode does NOT do
+
+- **No mutation loop.** The variant is a one-shot draft; the user reviews and decides what to apply.
+- **No convergence checking.** A single pass produces a single audit. Re-running is a fresh audit, not a continuation.
+- **No HTML dashboard.** Output is a single markdown report.
+- **No cover letter** unless the user explicitly asks. The cover-letter-subagent prompt template still applies if invoked separately.
+- **No file modification to the candidate's canonical resume.** The variant draft is saved as a sibling file (typical convention: a per-opening directory holding the variant markdown, never the canonical).
+
+### Output shape
+
+A single markdown report containing:
+
+- **Score line:** `X PASS / Y PARTIAL / Z FAIL ([pass rate])`
+- **Evals table** with eval # / name / verdict / one-line evidence per row
+- **Top 3 gaps** (cross-eval, prioritized by impact)
+- **Top 3 single-line revisions** (each one a specific before/after suggestion, anchored to substrate evidence)
+- **What to keep untouched** (the resume's strongest existing hits for this profile)
+- **Optional side flags** (anything noticed during the read that isn't directly a profile eval but is worth surfacing -- date coherence, voice drift, etc.)
+
+The report ends by offering the natural follow-on steps to the user:
+
+- Draft the variant cleanly to a per-opening file.
+- Run per-bullet review on the variant (see `references/per-bullet-review-mode.md`).
+- Port to a designed deliverable (HTML or Typst).
+- Run a separate cover-letter pass.
+
+### Hand-off to per-bullet review
+
+Manual one-shot review and per-bullet review pair naturally:
+
+- Manual one-shot produces a top-3-gap list and 3-7 candidate edits.
+- Per-bullet review walks the user through those edits one at a time.
+
+The handoff is: the one-shot audit's "top 3 revisions" section becomes the change list for the per-bullet review. Save the audit report under the per-opening directory so the user can refer back to it during the review.
+
+### Trace and reproducibility
+
+Even in manual one-shot mode, save the artifacts so the read is reproducible:
+
+- The hiring-manager profile (markdown, same schema as the autonomous loop's hiring-manager profiles).
+- The audit report (markdown, the shape above).
+- The variant draft (markdown, if drafted).
+
+These are the same file shapes the autonomous loop produces; manual one-shot is just a single-pass, single-target run of the same primitives.
+
+---
+
 ## how this connects to other tools
 
 **What feeds into autowrite:**

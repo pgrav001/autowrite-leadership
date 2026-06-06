@@ -114,6 +114,30 @@ After installing, **restart Claude Code** so the plugin registry picks up the ne
 
 ---
 
+## Quickstart: your first run
+
+The minimum-viable invocation. If you have a resume and two target companies, this is the path of least resistance.
+
+1. **Convert your resume to markdown if it isn't already.** Either point autowrite at a `.pdf` (it converts at Step 1.0; the original is never modified) or run a one-shot conversion in a separate session. The markdown is the canonical working format the loop operates on.
+2. **Pick 2-4 target companies** with a clear role qualifier (e.g., `"Anthropic / AI Engineer"`, `"Google DeepMind / Research Engineer"`). Two is the minimum that produces a meaningful aggregate; four is the comfortable maximum for a first run -- more profiles equal more wall-clock time and more API spend.
+3. **Invoke the skill.** Either type `/autowrite` and answer the STOP-and-confirm prompts, or invoke in natural language:
+
+   ```
+   Run autowrite on ~/path/to/resume.md for Anthropic / AI Engineer
+   and OpenAI / Member of Technical Staff.
+   ```
+
+4. **Confirm the defaults** when the skill prompts. For a first run, accept `runs_per_experiment: 1`, no budget cap, `profile_refresh: false`. Adjust later if you see specific signals; the defaults are tuned for most candidates.
+5. **Watch the dashboard.** When the loop starts, autowrite opens a local HTML dashboard in your browser. The dashboard refreshes every ~10 seconds and shows per-profile scores, the current mutation under evaluation, and the keep / discard verdict per experiment. You can walk away -- the loop runs autonomously.
+6. **Expect an hour or more for full multi-company convergence.** Each per-company variant locks when its profile holds at ≥90% pass rate for 3 consecutive experiments. Locked variants get saved as `applications/<company>/_company-locked.md` and the loop continues against any still-unlocked profiles.
+7. **After convergence:** the skill enters the secondary loop -- discovering active openings at each locked company, building per-role hiring-manager profiles, and rendering per-opening resume + cover-letter pairs as the final submission artifacts. The full output tree lands at `applications/<company>/<role>/`.
+
+For the first run, watch the dashboard for the first ~5 minutes to confirm the loop is healthy (profiles loaded, baselines scored, first mutation under consideration) -- then walk away. If anything looks off in those first 5 minutes (no profiles loaded, baseline scores all 0, dashboard not refreshing), interrupt and check the file-creation fallback notes in `skills/autowrite/SKILL.md`.
+
+A first run that produces locked variants for all targets and per-opening artifacts for the active roles is the success signal. Anything less is a setup issue -- check the SKILL's "before starting: gather context" section, restart, and re-invoke.
+
+---
+
 ## Usage
 
 Once installed and Claude Code has been restarted, invoke the skill in any Claude Code session:
@@ -234,6 +258,52 @@ Pass `profile_refresh: true` at invocation, or delete the cached profile file. T
 
 ---
 
+## Maintenance cadence
+
+autowrite is designed to be re-run periodically as the search progresses, not just once at the start. The cached profiles, locked variants, and per-opening artifacts compound when maintained on a cadence; they decay when left alone for months.
+
+**Weekly (during active search):**
+
+- Review the per-company directories for any opening discovered since last run -- the discovery subagent only fires when the loop runs, so new openings at locked companies need a fresh invocation to surface.
+- Update `applications/<company>/<role>/` directories with submission status (submitted, recruiter screen scheduled, rejected, advanced, offer). The tracker is the source of truth for what's live.
+- Archive submitted variants you've already heard back on, so the active surface stays clean.
+
+**Monthly (during active search):**
+
+- Re-read locked variants against the canonical resume. If you've made substantive content changes to the canonical (added a project, dropped a role), the locked variants are out of sync; either re-run autowrite to refresh them or accept that they're frozen at the prior canonical's snapshot.
+- Scan the changelog for mutation patterns. If the same gap keeps surfacing across companies, it's a canonical-level signal worth addressing in the upstream resume rather than per-variant.
+
+**Quarterly (or on a major company news event):**
+
+- **Refresh stale profiles.** The README's default `profile_refresh: false` reuses cached profiles indefinitely; companies' priorities shift. Set `profile_refresh: true` (or delete the profile file) before re-running. Fast-moving sectors (AI, gaming, biotech, fintech) need quarterly refresh; slow-moving sectors (utilities, government, established trades) can hold profiles 6 months.
+- **Re-research on major news.** If a target company has a CEO change, a reorg, a layoff wave, a new product launch, or a significant funding event, the profile is stale regardless of cache age -- force refresh.
+
+**End-of-search (after accepting an offer or pausing the search):**
+
+- Archive the working tree (`autowrite-<slug>/`) to a dated archive directory so it doesn't get re-baselined on the next search cycle.
+- Keep the cached profiles and per-company `_company-locked.md` files -- they're valuable substrate for the next search and refresh fast.
+- Capture lessons in the changelog: which mutations correlated with advance-to-loop outcomes, which were performative (improved scores but didn't change interview signal), which patterns are worth preserving across searches.
+
+## Outcome capture
+
+The autonomous loop optimizes against profile evals; it has no visibility into what actually happened when the resume was submitted. The highest-value signal in an active search is whether the submitted variant got an advance, a rejection, or silence -- and connecting that signal back to the loop is on the candidate.
+
+After each application outcome lands, append a row to `applications/<company>/results-outcomes.tsv`:
+
+```
+role	submitted_variant	submission_date	outcome	outcome_stage	outcome_date	notes
+director-of-eng	applications/<company>/director-of-eng/resume.md	2026-06-10	rejected	recruiter	2026-06-21	no feedback
+staff-engineer	applications/<company>/staff-engineer/resume.md	2026-06-12	advanced	hm	2026-06-19	HM cited the AI infra bullet
+```
+
+On subsequent autowrite runs for the same company:
+
+- Roles with `outcome: rejected` at the recruiter stage signal the variant's hiring-manager profile is too generous; the next sub-mutation pass should re-weight the evals the role specifically screened against.
+- Roles with `outcome: advanced` at the hiring-manager stage signal the variant is at the right shape; no further mutation needed for similar future roles at the same company.
+- Roles with `outcome: ghosted` (no response after the company's typical response window) should be treated as soft rejections for the purposes of mutation weighting.
+
+The loop doesn't auto-read this file (yet); the operator reads it before re-invoking and adjusts the `core_through_line` or surfaces patterns to the parent skill as a manual note. Future versions of the skill may read `results-outcomes.tsv` directly to bias the mutation engine on re-runs.
+
 ## Limitations
 
 - **Subagent variance.** Recruiter subagents are deterministic enough for single runs in most cases, but agentic eval scoring carries some noise. If you see implausible result flips without resume changes, bump `runs per experiment` to 3.
@@ -251,6 +321,19 @@ autowrite is a direct adaptation of the autoresearch skill structure (binary eva
 If autoresearch optimizes a skill prompt against fixed evals, autowrite optimizes a resume against *researched, company-specific* evals across multiple targets simultaneously. Same loop, different artifact, broader eval surface.
 
 ---
+
+## Related
+
+`autowrite` covers the artifact-generation side of the search workflow -- autonomous resume mutation, per-opening tailoring, cover-letter generation. A separate skill called `career-database` covers the upstream substrate layer: a Claim-to-Proof markdown database of strengths, evidence, stories, voice patterns, and operational session-continuity files that resumes are generated *from* rather than maintained alongside.
+
+The two skills are independent (no code-level dependencies) but compose cleanly. A typical end-to-end search workflow looks like:
+
+1. **`career-database`** -- build or maintain the substrate (the durable career facts; interview prep substrate; voice file; canonical artifact).
+2. **`career-intake`** (this plugin) -- optional bridge: if the candidate's substrate is in the resume but not yet in the supplementary library autowrite reads, run career-intake first to itemize the resume into seeded `bullets/` + `voice.md`.
+3. **`autowrite`** (this plugin) -- run against the canonical artifact + target companies. Per-opening variants land in `applications/<company>/<role>/`.
+4. **Per-opening tailoring + interview prep** -- back to `career-database` for the per-opening review, post-application feedback capture, and pre-interview prep cycle against the substrate.
+
+If you want the substrate layer: see `career-database`. If you want autonomous resume tailoring across multiple targets: stay here. Either or both, in any order.
 
 ## License
 

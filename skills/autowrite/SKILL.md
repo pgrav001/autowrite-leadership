@@ -816,6 +816,66 @@ If a resume "passes" all evals but doesn't actually read better -- the evals are
 
 ---
 
+## outcome capture (reading prior submission results)
+
+The autonomous loop optimizes against profile evals; it has no visibility into what actually happened when a variant was submitted. The README documents the operator-side discipline: append a row to `applications/<company>/results-outcomes.tsv` after each application outcome (rejected at recruiter screen, advanced to hiring manager round, ghosted past the company's typical response window, offer received).
+
+This section documents what the skill does with that file on subsequent runs.
+
+### Step 5.5: read results-outcomes.tsv before mutation
+
+After Step 5's baseline scoring but before the first mutation experiment, the skill checks each target company's directory for a `results-outcomes.tsv` file.
+
+```
+<resume-parent-dir>/applications/<company>/results-outcomes.tsv
+```
+
+If the file exists, parse it:
+
+```tsv
+role	submitted_variant	submission_date	outcome	outcome_stage	outcome_date	notes
+director-of-eng	applications/<company>/director-of-eng/resume.md	2026-06-10	rejected	recruiter	2026-06-21	no feedback
+staff-engineer	applications/<company>/staff-engineer/resume.md	2026-06-12	advanced	hm	2026-06-19	HM cited the AI infra bullet
+```
+
+Required columns: `role`, `submitted_variant`, `submission_date`, `outcome`, `outcome_stage`. Optional: `outcome_date`, `notes`.
+
+Valid `outcome` values: `rejected | advanced | ghosted | offer | withdrew`.
+
+Valid `outcome_stage` values: `applied | recruiter | hm | loop | offer-stage`.
+
+### How outcomes influence mutation weighting
+
+For the next mutation pass against the same company:
+
+- **`rejected` at `recruiter` stage:** the variant did not survive the first screen. The hiring-manager profile is too generous -- the recruiter saw the variant and bounced. On the next sub-mutation pass for similar roles at this company, re-weight any evals tagged as recruiter-screening signals (the JD-derived evals citing the "required" / "must have" sections of the JD) +20%. Surface in the changelog: "Re-weighting recruiter-screen evals due to prior rejection at recruiter stage."
+- **`rejected` at `hm` or `loop` stage:** the variant survived the screen but lost on substance / fit. Less likely to be a resume issue; more likely to be an interview-performance or genuine-fit issue. Do NOT auto-mutate -- log a note in the changelog ("Prior rejection at hm/loop stage; resume likely not the load-bearing factor. Operator should review interview substrate, not resume.") and continue normally.
+- **`advanced` at any stage:** the variant landed. For similar roles at this company, the variant's structure is at the right shape. Reduce the per-role sub-mutation budget by 25% (the variant is already good; don't over-tune). Tag any future locked variant for this company with `advance_signal: confirmed` in its frontmatter so the operator can prioritize re-applying with the same shape.
+- **`offer`:** treat as `advanced` for mutation-weighting purposes. Tag the variant as `outcome: offer` in its frontmatter; archive after the operator confirms the offer status (accepted / declined / negotiating).
+- **`ghosted`:** treat as soft `rejected` at the `applied` stage. The signal is weaker than an explicit rejection but the variant either did not get read or did not register enough for a response. Apply the recruiter-stage re-weighting at 50% strength (i.e., +10% rather than +20%) so the loop still adjusts without overcorrecting on a soft signal.
+- **`withdrew`:** the operator pulled the application. No signal for the mutation engine; skip the row.
+
+### When results-outcomes.tsv is absent
+
+Step 5.5 is a no-op when the file doesn't exist (typical for any company that hasn't seen a submission yet). The primary loop and secondary loop proceed normally.
+
+### Operator-side discipline
+
+The skill reads `results-outcomes.tsv` but does not write to it. The operator is responsible for appending rows when outcomes land. The skill assumes:
+
+- Rows are appended chronologically; the most recent row per `role` is authoritative if multiple rows exist for the same role.
+- Outcomes are honest. The skill cannot detect fabricated outcomes (claiming `advanced` to bias the loop toward keeping a variant the operator likes). Garbage in, garbage out.
+- The operator updates the file before re-running autowrite for that company. If results land after a run starts, the next run picks them up.
+
+### What outcome capture does NOT do
+
+- It does not change which roles are surfaced by the discovery subagent. Discovery is independent of outcome history.
+- It does not change the company profile itself. Company-level evals reflect company-level hiring criteria; outcomes inform role-level weighting only.
+- It does not write to the cover-letter subagent's behavior. Cover letters are generated fresh per role; prior outcomes on similar roles do not influence the prose.
+- It does not retroactively edit locked variants. A locked variant stays locked even if a later outcome would have prevented the lock.
+
+---
+
 ## manual one-shot review mode
 
 The default flow above is a multi-hour autonomous loop -- the right tool when scoring against several target companies in parallel. Some users want the discipline of the eval framework without the loop overhead: a single opening, a single audit, a single variant draft, no convergence cycles.

@@ -336,6 +336,12 @@ The lock-and-branch design recognizes that different companies have divergent hi
 
    **Voice-drift discipline.** If Step 1.1 loaded `voice.md`, the mutation engine should prefer phrasings drawn from the supplementary library's verbatim quotes over assistant-paraphrased reformulations. When a mutation proposes new wording (not lifted from the library), do a quick check: does it sound like the candidate's documented voice patterns? If it reaches for cliches the voice file explicitly flags ("spearheaded," "transformational impact," "results-driven"), revise to a voice-consistent alternative before re-scoring. This is a soft constraint -- the recruiter subagent's voice-drift eval (see [references/recruiter-subagent-prompt.md](references/recruiter-subagent-prompt.md)) is the hard enforcement layer.
 
+   **Documented-but-not-applied mutations (decision-conflict and confirmation-gated).** Separate from fabrication: some mutations are *factually supportable* and *would raise the score*, but the engine still must not silently apply them. Two cases:
+   - **Decision-conflict.** The mutation reverses a choice the user previously made and logged (in `DECISIONS.md` or equivalent) -- e.g. re-adding a name/detail the user deliberately removed, or reversing a neutralization the user requested. The prior rationale may now be moot, but reversing a logged user decision is the user's call, not the engine's.
+   - **Confirmation-gated.** The mutation *extends* approved language rather than quoting it -- the supporting facts exist, but the specific new phrasing (a boundary claim, a characterization of how something worked) hasn't been validated by the user in those words.
+
+   In both cases: **document the mutation in the changelog under a "Documented-but-NOT-applied" heading -- with the exact proposed text, the source that supports it, the predicted score effect, and the reason it's gated -- and do NOT apply it.** This preserves the score lift as a ready-to-approve option without the engine overstepping. It is the score-positive analogue of the candidate-question mechanism: candidate-question = "can't support it, ask"; documented-but-not-applied = "can support it and it helps, but the call is the user's."
+
 4. **Branch the working file per active profile.** If multiple profiles are active, maintain one mutation track per profile so mutations don't bleed across companies whose bars genuinely differ. The working files live at:
 
    ```
@@ -632,6 +638,16 @@ After each experiment (whether kept or discarded), append to `changelog.md`:
 **Voice-drift check:** [If `voice.md` was loaded: `pass | flagged-and-revised | n/a (mutation reused existing resume phrasing)`. Note the specific voice pattern the mutation matched or violated.]
 **Remaining gaps:** [Brief description of what still fails, top 1-2 items]
 ```
+
+At the **end of the run**, if any score-positive mutations were held back per the documented-but-not-applied discipline (step 5), collect them under a dedicated heading so the user sees the ready-to-approve options in one place:
+
+```markdown
+## Documented-but-NOT-applied mutations (need user's call)
+
+1. **[One-line description]** -- proposed text: "[exact string]". Source: [what supports it]. Predicted effect: [profile + eval + score delta]. Gated because: [decision-conflict with <logged decision> | confirmation-gated: extends approved language, needs user to confirm the phrasing].
+```
+
+Each entry is a mutation the engine judged both supportable and score-improving but declined to apply on its own authority. The user can approve any of them in a follow-up with no re-derivation.
 
 The `Source:` field is the audit trail. When an interviewer asks "where did this claim come from?" the candidate has receipts: every kept mutation traces to a specific file in the supplementary library or to a re-framing of resume content the candidate already approved. Mutations that surfaced as candidate questions (rather than as applied changes) are also logged so the candidate sees the full set of proposals -- not just the ones that landed.
 

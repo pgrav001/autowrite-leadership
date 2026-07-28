@@ -88,11 +88,22 @@ Format each eval exactly as in profile-template.md:
 
 ```
 EVAL [N]: <Short name>
+Tier: minimum | responsibility | bonus
 Question: <Yes/no question about the resume>
 Pass: <Specific positive condition>
 Fail: <Specific negative condition>
 Source: <citation; for inherited evals, also note "Inherited from: company profile">
 ```
+
+**Every eval carries a `Tier:` line**, assigned from the JD section the eval came from:
+
+- `minimum` -- the JD's minimum-qualifications list ("What We're Looking For", "Requirements", "Minimum Qualifications"). This is the screening bar.
+- `responsibility` -- the JD's responsibilities list ("What You'll Do", "The Role"). The day-to-day job and the interview-probe surface, NOT resume-screen criteria.
+- `bonus` -- the JD's explicitly-optional list ("Bonus Points", "Preferred", "Nice to Have").
+
+Assign the tier from where the requirement actually appears in the JD, not from how important it sounds. A seniority or title expectation printed under "Bonus Points" is `bonus`, even when it reads as the most role-defining line in the posting. Inherited company evals default to `minimum` unless the JD restates them lower.
+
+If the JD does not separate its requirements into lists, tag every eval `minimum` and note that in `## Profile limitations`.
 
 JD-derived evals must NOT:
 - Test for skills the JD does not name (do not invent requirements)

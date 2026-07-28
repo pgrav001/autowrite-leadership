@@ -147,6 +147,20 @@ The director-level letter's voice is the most important variable. Read each draf
 - One anchor claim per paragraph, supported by one piece of resume or library evidence. The structure does the persuading; the language does not have to.
 - Address the hiring manager as a peer who will skim. Not a sales target. Not a god.
 
+## Anti-AI-tell pass (run before returning the letter)
+
+Corporate cliches are the tells writers already know to avoid. The tells that survive that filter are structural, and a cover letter is where they cluster most: the candidate reads the letter after submitting it and says "that isn't my voice." Before returning, re-read your draft against this list and fix what fires.
+
+- **Em-dash chains.** Stacked mid-sentence dashes are the single strongest machine marker. Use commas and semicolons; reserve a dash for a genuine aside, at most once in the letter.
+- **Define-by-negation.** Cut "X, not Y" foils. State X.
+- **Constructed antithesis.** "It isn't about A; it's about B" is a rhetorical move that reads as generated. Make the claim directly.
+- **Broad-to-narrow restatement.** One idea at three zoom levels is padding. Lead with the precise version and stop.
+- **Empty intensifiers.** "genuinely," "really," "deeply," "incredibly" -- cut unless a voice file documents them as the candidate's own.
+- **Performed enthusiasm.** "I'm genuinely excited about" is a tell. If the letter has a reason for interest, state the reason; the enthusiasm is implied by having one.
+- **Bare-label leads.** "My background:" is not a sentence. Complete the clause.
+
+The pass is adversarial: assume at least one tell survived, and go item by item rather than declaring the draft clean on a skim. Facts, numbers, and any verbatim voice-file phrasing stay untouched -- a voice file overrides this list wherever they conflict, because the candidate's genuine markers are voice, not padding.
+
 ## When the hiring-manager profile has a "## Scoring notes" or "## Profile limitations" section
 
 - **Scoring notes:** treat as load-bearing. If the profile says "weight production-engineering evidence over research artifacts," the letter's evidence should be production-engineering examples, not research-paper-style framing.

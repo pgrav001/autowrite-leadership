@@ -151,6 +151,52 @@ The framing is **spend Highlights on what THIS opening screens for, not on what'
 
 ---
 
+## tier the evals by the JD's own lists
+
+For a **hiring-manager (role) profile** built from a specific job description, tag each eval with the JD section it came from, and **report a tally per tier.** Do not collapse them into one aggregate.
+
+Most JDs separate their requirements into three lists, and the lists are not equally binding:
+
+| Tier | Typical JD heading | What it actually is |
+|---|---|---|
+| `minimum` | "What We're Looking For", "Requirements", "Minimum Qualifications" | The screening bar. This is what a recruiter filters on. |
+| `responsibility` | "What You'll Do", "The Role" | The day-to-day job, and the interview-probe surface. **Not** resume-screen criteria. |
+| `bonus` | "Bonus Points", "Preferred", "Nice to Have" | Explicitly optional by the company's own statement. |
+
+Add the tier to the eval template:
+
+```
+EVAL [N]: [Short name]
+Tier: minimum | responsibility | bonus
+Question: [Yes/no question about the resume]
+...
+```
+
+And report the score as three tallies plus the total:
+
+```
+minimum:        4 PASS / 1 PARTIAL / 1 FAIL
+responsibility: 2 PASS / 2 PARTIAL / 3 FAIL
+bonus:          1 PASS / 1 PARTIAL / 1 FAIL
+-------------------------------------------
+total:          7 PASS / 4 PARTIAL / 5 FAIL
+```
+
+**Why this matters more than it sounds like it should.** A flat aggregate silently weights an optional "bonus points" line the same as a hard minimum qualification, and the resulting number drives a go/no-go. In a real case the aggregate read `7 PASS / 4 PARTIAL / 5 FAIL` -- a bad fit, and the candidate dropped the role. Re-cut against the JD's own tiers, the six actual minimum qualifications scored `4 PASS / 1 PARTIAL / 1 FAIL`. Every alarming FAIL sat in responsibilities or bonus, and the seniority gap that looked disqualifying was literally printed under "Bonus Points." The tiered read reopened a real opportunity the aggregate had closed.
+
+The distortion runs both directions. An aggregate can also look reassuring while the resume fails two hard minimums, because a stack of easy responsibility passes buries them.
+
+**Consequences for the mutation loop:**
+
+- **Mutate against `minimum` failures first.** A FAIL on a minimum qualification is a screen-out; a FAIL on a responsibility is an interview question. They are not worth the same mutation budget.
+- **Don't spend Highlight space on `bonus` evals.** Skim altitude is scarce (see Highlights management above) and bonus criteria are optional by the company's own admission.
+- **A `responsibility` FAIL is prep substrate, not a resume defect.** Route it to interview prep rather than trying to mutate a claim the candidate can't honestly make.
+- **Report the tiers in the changelog and dashboard**, not just the total, so a human reading the run can see *where* the resume lands rather than only how high.
+
+For **company profiles** (not derived from a single JD), tiering usually doesn't apply -- there's no authored list to segment by. Leave the tier off, or tag everything `minimum`.
+
+---
+
 ## common mistakes when researching profiles
 
 ### 1. Too many evals (more than 12 for company profiles, 15 for hiring-manager profiles)
@@ -202,6 +248,7 @@ Copy this for each eval inside a profile:
 
 ```
 EVAL [N]: [Short name]
+Tier: minimum | responsibility | bonus   (role profiles only -- omit for company profiles)
 Question: [Yes/no question about the resume]
 Pass: [What "yes" looks like -- one sentence, specific to this company or role]
 Fail: [What triggers "no"]
@@ -212,6 +259,7 @@ Example:
 
 ```
 EVAL 1: Project-scale evidence
+Tier: minimum
 Question: Does the resume describe at least one project of comparable scale to the role's typical engagement (budget, duration, team size, or output volume)?
 Pass: At least one bullet names a project with two or more quantified scale dimensions (e.g., "$2M budget, 14-person crew, 9-month duration").
 Fail: Only vague project descriptions; no quantified scale dimensions.

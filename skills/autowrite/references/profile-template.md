@@ -57,6 +57,7 @@ What this company explicitly does NOT hire for, or what gets resumes rejected. 3
 ```
 
 EVAL 1: <Short name>
+Tier: minimum | responsibility | bonus   (role profiles built from a JD -- omit for company profiles)
 Question: <Yes/no>
 Pass: <Specific>
 Fail: <Specific>
@@ -74,6 +75,17 @@ Any additional context for the recruiter subagent about *how* to score this comp
 
 This section is optional. Use it only when scoring nuance can't be captured cleanly in the eval pass/fail definitions.
 
+**Role profiles: report the score per tier, never as one aggregate.**
+
+```
+minimum:        N PASS / N PARTIAL / N FAIL
+responsibility: N PASS / N PARTIAL / N FAIL
+bonus:          N PASS / N PARTIAL / N FAIL
+total:          N PASS / N PARTIAL / N FAIL
+```
+
+A flat total weights an optional "bonus points" line the same as a hard minimum qualification, which misleads the go/no-go in both directions. See [eval-guide.md](eval-guide.md) § "tier the evals by the JD's own lists".
+
 ```
 
 ---
@@ -85,6 +97,7 @@ Before saving a profile, the autowrite loop validates:
 - [ ] All sections present and non-empty (or explicitly flagged as "not found")
 - [ ] 6 to 12 evals (no fewer, no more)
 - [ ] Every eval is binary yes/no
+- [ ] **Role profiles built from a JD:** every eval carries a `Tier:` line (`minimum` / `responsibility` / `bonus`) traceable to the JD section it came from, and the score is reported per tier
 - [ ] At least 3-4 evals are clearly company-specific (would not appear unchanged in another company's profile)
 - [ ] Each eval has a `Source:` line citing a real, current public signal
 - [ ] `researched_at` date is set

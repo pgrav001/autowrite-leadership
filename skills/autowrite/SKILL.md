@@ -504,6 +504,14 @@ Save each recruiter report to:
 
 This is the **opening-level baseline** -- the locked company variant scored against this specific role's requirements. Some roles will pass at high rates (the locked variant happens to fit); others will surface real gaps.
 
+**Report the score per JD tier, not as a single aggregate.** Hiring-manager profiles tag every eval `minimum` / `responsibility` / `bonus` (see [references/eval-guide.md](references/eval-guide.md) § "tier the evals by the JD's own lists"), and the recruiter report returns a `tier_breakdown`. Surface all three lines wherever a role's score appears -- the dashboard, the changelog, the announce message:
+
+```
+minimum:        4/6   responsibility: 2/7   bonus: 1/3   (total 7/16)
+```
+
+A flat aggregate weights an optional "bonus points" line the same as a hard minimum qualification. That distortion is not academic: a role scored `7 PASS / 4 PARTIAL / 5 FAIL` in aggregate reads as a bad fit and gets dropped, when the six actual minimum qualifications scored `4 PASS / 1 PARTIAL / 1 FAIL` and every alarming FAIL sat in responsibilities or bonus. The aggregate hides both the false negative and its mirror image -- a comfortable-looking total covering two failed minimums.
+
 ### 6d. Sub-mutation loop per role
 
 For each role where the baseline score is below the lock threshold (≥90% pass rate), run a sub-mutation loop:
@@ -513,6 +521,11 @@ For each role where the baseline score is below the lock threshold (≥90% pass 
 3. Re-score with the recruiter subagent + hiring-manager profile.
 4. Keep/discard per the primary loop's rules.
 5. Lock the role when pass rate hits ≥90% for 3 consecutive experiments OR when a per-role budget (default: 5 mutations) exhausts.
+
+**Spend the mutation budget by tier.** Order candidate mutations `minimum` failures first, then `responsibility`, then `bonus` -- a failed minimum qualification is a screen-out, while a failed responsibility is an interview question the resume was never going to answer. Two consequences:
+
+- **Don't buy a `bonus` eval with skim-altitude space** (a Highlight swap) while a `minimum` eval is still failing.
+- **A `responsibility` FAIL that the substrate can't honestly support is prep substrate, not a resume defect.** Route it to the role's interview-prep notes and stop mutating against it. Lock the role on its `minimum` tier even if the total sits below threshold, and say so in the changelog.
 
 For roles that already pass at baseline (≥90% on the first recruiter scoring), no sub-mutation loop needed. The locked company variant IS the opening-tailored resume. Copy `_company-locked.md` to `<role-slug>/resume.md` unchanged and mark the role as "ready-to-submit at baseline."
 
@@ -631,6 +644,7 @@ After each experiment (whether kept or discarded), append to `changelog.md`:
 
 **Aggregate:** [previous]% -> [new]% (delta [+/-X.X])
 **Per-profile deltas:** anthropic [prev->new], openai [prev->new], google-deepmind [prev->new]
+**Per-tier (role profiles only):** minimum [prev->new], responsibility [prev->new], bonus [prev->new] -- report the three lines even when the aggregate is flat, since a mutation that moves a minimum-tier eval matters more than the total suggests
 **Mutation:** [One sentence describing what was changed -- which section, which bullet, what swap]
 **Source:** [Where the new phrasing came from -- one of: `bullets/<file>.md` (cite the specific file + provenance grade, e.g., `bullets/meta-ise.md (grade 2: interview-round-3)`), `interview-notes/<file>.md`, `narratives/<file>.md`, `re-framing of existing resume bullet`, `voice-aligned reformulation of existing claim`, or `candidate question (not yet confirmed)` for mutations that surfaced as questions rather than as applied changes]
 **Reasoning:** [Why this change was expected to help -- which gap from which profile(s)]
@@ -914,11 +928,11 @@ This section documents that mode. It is structurally a subset of the full flow: 
 
 ### What manual one-shot mode does
 
-1. **Read the JD.** Either passed in by the user or fetched from a URL.
+1. **Read the JD.** Either passed in by the user or fetched from a URL. **If a fetch fails, ask the user to paste the JD text -- after the first failure, not the fourth.** Several large employers serve their postings from JavaScript single-page apps that return an empty shell to WebFetch, and no amount of retrying, URL-rewriting, or alternate-mirror hunting gets the text out. The user has the page open in a browser; a paste costs them ten seconds and costs you nothing. Burning four scrape attempts before asking is pure token waste, and the user notices.
 2. **Read the current resume** (markdown form; convert from PDF per Step 1.0 if needed).
 3. **Build the hiring-manager profile in a single pass.** Follow the schema in `references/hiring-manager-subagent-prompt.md` -- 8-15 binary evals, half inherited from a company-bar shape, half JD-derived with passage citations. If no company-bar profile exists, derive a slim one from public signals (the company's careers page, recent product launches, a blog post or two) or skip inheritance and run 8-12 JD-derived evals.
-4. **Score the current resume against the profile.** Walk eval-by-eval, mark each PASS / PARTIAL / FAIL, cite the resume evidence (or the absence of it). Compute the binary pass rate (treating PARTIAL as FAIL per the eval-guide's golden rule); compare against the 90% lock threshold.
-5. **Identify the top 3 cross-eval gaps.** Surface what the resume would need to change to move from current score to lock-threshold.
+4. **Score the current resume against the profile.** Walk eval-by-eval, mark each PASS / PARTIAL / FAIL, cite the resume evidence (or the absence of it). Compute the binary pass rate (treating PARTIAL as FAIL per the eval-guide's golden rule); compare against the 90% lock threshold. **Report the score per JD tier** (`minimum` / `responsibility` / `bonus`) as well as in total -- in manual mode the score usually drives a human go/no-go, which is exactly where a flat aggregate does the most damage. See [references/eval-guide.md](references/eval-guide.md) § "tier the evals by the JD's own lists".
+5. **Identify the top 3 cross-eval gaps.** Surface what the resume would need to change to move from current score to lock-threshold. Rank `minimum`-tier gaps above the rest; a `responsibility` gap the substrate can't honestly close is interview prep, not a resume revision.
 6. **Draft a variant** addressing the top 3 gaps -- one specific edit per gap, anchored to evidence the user has in their substrate or elsewhere. Do not invent claims. If a gap can only be addressed by a claim the substrate doesn't support, flag it as a candidate question and do not draft the edit.
 7. **Present the audit + variant to the user** as a single report: score, evals table, top-3 gaps, proposed revisions per gap, recommendation for what to keep untouched.
 
@@ -934,9 +948,9 @@ This section documents that mode. It is structurally a subset of the full flow: 
 
 A single markdown report containing:
 
-- **Score line:** `X PASS / Y PARTIAL / Z FAIL ([pass rate])`
-- **Evals table** with eval # / name / verdict / one-line evidence per row
-- **Top 3 gaps** (cross-eval, prioritized by impact)
+- **Score lines:** the per-tier tallies first, then the total -- `minimum: X PASS / Y PARTIAL / Z FAIL`, same for `responsibility` and `bonus`, then `total: X PASS / Y PARTIAL / Z FAIL ([pass rate])`
+- **Evals table** with eval # / name / tier / verdict / one-line evidence per row
+- **Top 3 gaps** (cross-eval, prioritized by impact, `minimum` tier first)
 - **Top 3 single-line revisions** (each one a specific before/after suggestion, anchored to substrate evidence)
 - **What to keep untouched** (the resume's strongest existing hits for this profile)
 - **Optional side flags** (anything noticed during the read that isn't directly a profile eval but is worth surfacing -- date coherence, voice drift, etc.)

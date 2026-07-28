@@ -64,12 +64,15 @@ For each eval in the profile's `## Binary eval criteria` section:
 For each eval, record:
 - `eval_number`: the eval's number (1, 2, 3, ...)
 - `eval_name`: the eval's short name
+- `eval_tier`: the eval's `Tier:` value (`minimum`, `responsibility`, or `bonus`). If the profile's evals carry no `Tier:` line, use `null`.
 - `passed`: `true` or `false`
 - `evidence`: one sentence quoting or summarizing the resume content that drove the decision. If failed, also note what would need to be added to pass.
 
+**Tiers change how you prioritize, not how you score.** Score every eval literally against its own Pass/Fail condition regardless of tier. But when you rank gaps and pick the highest-priority revision, weight them by tier: a failed `minimum` eval is a screen-out and outranks everything; a failed `responsibility` eval is an interview question, not a resume defect; a failed `bonus` eval is by the company's own statement optional. Do not recommend spending scarce resume real estate on a `bonus` gap while a `minimum` gap is open.
+
 After scoring, identify:
 - The top 3 **strengths**: things the resume does well from this company's perspective, regardless of which specific evals they map to.
-- The top 3 **gaps**: things the resume is missing or weak on, prioritized by how much they hurt at this company specifically.
+- The top 3 **gaps**: things the resume is missing or weak on, prioritized by how much they hurt at this company specifically -- `minimum`-tier gaps first.
 - The **single highest-priority revision suggestion**: one concrete change to the resume that would have the largest positive impact on this profile's evals. Be specific -- name the section, the bullet, the swap.
 
 ## Voice-drift check (only when voice.md content was provided)
@@ -103,6 +106,7 @@ Return a JSON-shaped report. Do not return anything else -- no preamble, no post
     {
       "eval_number": 1,
       "eval_name": "<short name>",
+      "eval_tier": "minimum | responsibility | bonus | null",
       "passed": true,
       "evidence": "<one-sentence justification>"
     },
@@ -111,6 +115,11 @@ Return a JSON-shaped report. Do not return anything else -- no preamble, no post
   "pass_count": <number of evals passed>,
   "total_evals": <total eval count>,
   "pass_rate_pct": <pass_count / total_evals * 100, rounded to 1 decimal>,
+  "tier_breakdown": {
+    "minimum":        { "pass": <n>, "total": <n> },
+    "responsibility": { "pass": <n>, "total": <n> },
+    "bonus":          { "pass": <n>, "total": <n> }
+  },
   "strengths": [
     "<strength 1>",
     "<strength 2>",
@@ -144,6 +153,7 @@ Return a JSON-shaped report. Do not return anything else -- no preamble, no post
 ## Constraints
 
 - **Score against the profile's evals only.** Don't invent additional checks.
+- **`tier_breakdown` only applies when the profile's evals carry `Tier:` lines.** If they don't (typical for company profiles, which aren't derived from a single JD), set every `eval_tier` to `null` and return `"tier_breakdown": null`. Never guess a tier the profile didn't assign.
 - **Apply the Pass/Fail conditions literally.** If a Pass condition says "names a specific multi-agent system shipped in the last 18 months" and the resume names a system but doesn't specify the timeframe, that's a fail -- the eval was specific about timeframe for a reason.
 - **Be specific in evidence.** "The current-role bullet" is not specific. "The bullet stating 'shipped 14 products in 5 months' provides timeframe and adoption signal" is specific. Quote or summarize the actual resume content that drove the decision.
 - **Do not pad gaps.** If the resume genuinely only has 2 meaningful gaps, return 2. Don't fabricate a third.

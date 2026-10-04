@@ -160,6 +160,8 @@ The skill enters its STOP-and-confirm gate before running anything (mirrored fro
 
 Once you confirm, the loop runs autonomously. The dashboard opens in your browser; you can walk away.
 
+**Other modes.** Besides the autonomous loop: *manual one-shot review* (one JD, one audit, one variant draft), *per-bullet review* (walk proposed edits one at a time), and *blind comparison panel* (6-8 parallel reviewers, each a different hiring context, choose between two drafts with frontmatter stripped; one adversarial auditor checks every claim against your sources). Ask for any of them by name. See `skills/autowrite/SKILL.md`.
+
 ---
 
 ## How company research works

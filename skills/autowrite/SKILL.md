@@ -308,6 +308,9 @@ The lock-and-branch design recognizes that different companies have divergent hi
    - Padding to fill space
    - Generic resume cliches ("results-driven," "passionate about")
    - Adding a claim that isn't true -- recruiter subagents may pass on it but a real interviewer will catch you
+   - Tightening a claim until its qualifier falls off. Scope words ("on the payments team"), count words ("two programs" becoming "five functions"), and sequence words ("promoted over four years" becoming "I promoted") are the usual casualties. The shorter line is specific, confident, and false. When a mutation shortens a claim, name the dropped qualifier in the changelog entry and confirm it wasn't load-bearing.
+
+   **Displacement rule at the page limit.** When the resume is already at its page or word limit, an "add" mutation must name the line it displaces or shrinks, and the changelog entry records both. Without this, a run that keeps adding what each eval flags as missing bloats the resume past the limit and buries the strongest lines.
 
    **When the active profile has `director_level: true`, apply this additional mutation discipline:**
 
@@ -682,6 +685,7 @@ When the user returns or the loop stops, present:
 7. **The original resume is untouched.** All artifacts live in `<resume-parent-dir>/autowrite-<resume-slug>/` (working dir for primary loop) and `<resume-parent-dir>/applications/` (locked variants + per-opening submission artifacts).
 8. **Profile cache state:** Which company profiles were researched fresh, which used cache; same for hiring-manager profiles.
 9. **Location of `results.tsv`, `changelog.md`, `dashboard.html`, and per-company `results-openings.tsv`** for reference.
+10. **Pre-send provenance check, per submission-ready resume.** Before telling the user an artifact is ready to send, list every number on the page with the source it came from (resume, library file, or user confirmation) and confirm it sits under the role where it happened. A current-role bullet carrying a figure from an earlier role is a common, invisible failure, and the mutation loop can create it when it pulls phrasing from the library. Also confirm that any correction the user made in an earlier run is present in this file. Corrections regress when a new variant is written from an older one, and a changelog line saying a fix was applied doesn't prove it's in the file. Report any number without a traceable source as a candidate question, not as ready.
 
 ---
 
@@ -928,7 +932,7 @@ This section documents that mode. It is structurally a subset of the full flow: 
 
 ### What manual one-shot mode does
 
-1. **Read the JD.** Either passed in by the user or fetched from a URL. **If a fetch fails, ask the user to paste the JD text -- after the first failure, not the fourth.** Several large employers serve their postings from JavaScript single-page apps that return an empty shell to WebFetch, and no amount of retrying, URL-rewriting, or alternate-mirror hunting gets the text out. The user has the page open in a browser; a paste costs them ten seconds and costs you nothing. Burning four scrape attempts before asking is pure token waste, and the user notices.
+1. **Read the JD.** Either passed in by the user or fetched from a URL. Most applicant-tracking-system boards are JavaScript single-page apps, so a plain fetch returns an empty shell. **Try the board's JSON API once before asking:** for Workday (`*.myworkdayjobs.com`), insert `/wday/cxs/<tenant>` before the site path (`https://<tenant>.wd5.myworkdayjobs.com/wday/cxs/<tenant>/<Site>/job/<Location>/<Job-Slug>_<REQ-ID>`). It returns the full posting HTML plus the requisition ID, posted date, remote type, and pay range where disclosed. Read the body rather than trusting the `remoteType` field, which can disagree with the posting text. **Save whatever you get verbatim as `jd.md` in the per-opening directory**, because postings get taken down and the saved copy may become the only one. **If that attempt fails too, ask the user to paste the JD text -- after the first failure, not the fourth.** Several large employers serve their postings from JavaScript single-page apps that return an empty shell to WebFetch, and no amount of retrying, URL-rewriting, or alternate-mirror hunting gets the text out. The user has the page open in a browser; a paste costs them ten seconds and costs you nothing. Burning four scrape attempts before asking is pure token waste, and the user notices.
 2. **Read the current resume** (markdown form; convert from PDF per Step 1.0 if needed).
 3. **Build the hiring-manager profile in a single pass.** Follow the schema in `references/hiring-manager-subagent-prompt.md` -- 8-15 binary evals, half inherited from a company-bar shape, half JD-derived with passage citations. If no company-bar profile exists, derive a slim one from public signals (the company's careers page, recent product launches, a blog post or two) or skip inheritance and run 8-12 JD-derived evals.
 4. **Score the current resume against the profile.** Walk eval-by-eval, mark each PASS / PARTIAL / FAIL, cite the resume evidence (or the absence of it). Compute the binary pass rate (treating PARTIAL as FAIL per the eval-guide's golden rule); compare against the 90% lock threshold. **Report the score per JD tier** (`minimum` / `responsibility` / `bonus`) as well as in total -- in manual mode the score usually drives a human go/no-go, which is exactly where a flat aggregate does the most damage. See [references/eval-guide.md](references/eval-guide.md) § "tier the evals by the JD's own lists".
@@ -953,7 +957,7 @@ A single markdown report containing:
 - **Top 3 gaps** (cross-eval, prioritized by impact, `minimum` tier first)
 - **Top 3 single-line revisions** (each one a specific before/after suggestion, anchored to substrate evidence)
 - **What to keep untouched** (the resume's strongest existing hits for this profile)
-- **Optional side flags** (anything noticed during the read that isn't directly a profile eval but is worth surfacing -- date coherence, voice drift, etc.)
+- **Optional side flags** (anything noticed during the read that isn't directly a profile eval but is worth surfacing -- date coherence, voice drift, a number whose source or role placement can't be traced, etc.)
 
 The report ends by offering the natural follow-on steps to the user:
 
@@ -980,6 +984,16 @@ Even in manual one-shot mode, save the artifacts so the read is reproducible:
 - The variant draft (markdown, if drafted).
 
 These are the same file shapes the autonomous loop produces; manual one-shot is just a single-pass, single-target run of the same primitives.
+
+---
+
+## blind comparison panel mode
+
+When two structurally different drafts of the same artifact exist and the choice between them isn't obvious (a canonical rewrite, a major variant, a restructured summary), run a blind panel instead of the eval loop. Six to eight parallel reviewers, each a different hiring context, compare `DRAFT-A` and `DRAFT-B` with all frontmatter stripped and return a forced verdict, accuracy findings, additions that each name their displacement, and where the candidate's stated priorities are wrong for their context. Exactly one reviewer, an adversarial auditor, gets read access to the candidate's source materials.
+
+The verdict is rarely the most valuable output. Accuracy findings outrank it, and the shape of the split (which lenses chose which draft) is often a positioning finding in its own right. The mode is report-only: the candidate picks the base and the changes.
+
+Full setup, lens set, reviewer output format, and synthesis rules: [references/blind-panel-mode.md](references/blind-panel-mode.md).
 
 ---
 

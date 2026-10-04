@@ -57,6 +57,8 @@ For every candidate role you find, you MUST verify it is currently active before
 - HTTP errors (404, 410) or redirects to a "jobs index" page
 - A "posted" or "updated" date on the JD page
 
+Most ATS boards render client-side, so a plain fetch can return an empty shell that looks like a dead posting. Before marking a role `unverified` for that reason, try the board's JSON API once. For Workday (`*.myworkdayjobs.com`), insert `/wday/cxs/<tenant>` before the site path; the response carries the full posting, `postedOn`, and the requisition ID. Note in `active_status_evidence` which route verified the role.
+
 Record the result in the role's `active_status` field (see JSON shape below). Do NOT silently drop roles that fail verification -- include them with `active_status: "closed"` or `"unverified"` and let the user see the full picture.
 
 Posting freshness:
